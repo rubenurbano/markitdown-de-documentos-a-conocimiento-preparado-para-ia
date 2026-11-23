@@ -1,0 +1,2935 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+<title>MarkItDown: De Documentos a Conocimiento Preparado para IA by Rubén Sbarsky</title>
+<style>
+:root {
+  --bg-main: #0a0e1a;
+  --bg-card: #0f172a;
+  --bg-elevated: #1e293b;
+  --border-accent: #1e3a5f;
+  --text-primary: #e2e8f0;
+  --text-secondary: #94a3b8;
+  --accent-primary: #38bdf8;
+  --accent-secondary: #00d4ff;
+  --accent-glow: rgba(56, 189, 248, 0.18);
+  --success: #10b981;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+  --nav-height: 58px;
+  --base-font: 16px;
+}
+
+[data-theme="light"] {
+  --bg-main: #f8fafc;
+  --bg-card: #ffffff;
+  --bg-elevated: #f1f5f9;
+  --border-accent: #cbd5e1;
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --accent-primary: #0284c7;
+  --accent-secondary: #0369a1;
+  --accent-glow: rgba(2, 132, 199, 0.12);
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: var(--base-font);
+  scroll-behavior: smooth;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+}
+
+body {
+  background-color: var(--bg-main);
+  color: var(--text-primary);
+  line-height: 1.65;
+  overflow-x: hidden;
+  padding-top: var(--nav-height);
+  padding-bottom: 84px;
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+/* Barra superior fija */
+.top-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--nav-height);
+  background: rgba(10, 14, 26, 0.94);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border-accent);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 10px;
+  z-index: 40;
+}
+
+[data-theme="light"] .top-nav {
+  background: rgba(248, 250, 252, 0.94);
+}
+
+.progress-bar {
+  position: fixed;
+  top: var(--nav-height);
+  left: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+  width: 0%;
+  z-index: 41;
+  transition: width 0.15s ease;
+}
+
+.nav-logo-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: #060b19;
+  border: 1px solid var(--border-accent);
+  cursor: pointer;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 42px;
+  padding: 0 14px;
+  border-radius: 999px;
+  border: 1px solid var(--border-accent);
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-size: 0.875rem;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+
+.chip:hover, .chip:focus-visible {
+  border-color: var(--accent-primary);
+  background: var(--accent-glow);
+  outline: none;
+}
+
+.chip.active {
+  background: var(--accent-primary);
+  color: #04101d;
+  border-color: var(--accent-primary);
+}
+
+.tabs-scroll {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  flex: 1;
+  padding: 4px 0;
+}
+
+.tabs-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.tools-bar {
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border-accent);
+  padding: 10px 14px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.search-box {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 210px;
+  position: relative;
+}
+
+.search-input {
+  width: 100%;
+  min-height: 40px;
+  padding: 6px 36px 6px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border-accent);
+  background: var(--bg-main);
+  color: var(--text-primary);
+  font-size: 0.9rem;
+}
+
+.search-input:focus {
+  outline: 2px solid var(--accent-primary);
+  border-color: transparent;
+}
+
+.search-clear {
+  position: absolute;
+  right: 8px;
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 1.1rem;
+  cursor: pointer;
+  padding: 4px;
+  display: none;
+}
+
+.utility-controls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.util-btn {
+  min-height: 38px;
+  min-width: 38px;
+  padding: 0 10px;
+  border-radius: 8px;
+  border: 1px solid var(--border-accent);
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.util-btn:hover {
+  border-color: var(--accent-primary);
+}
+
+/* Panel lateral Índice (#dr) */
+#dr {
+  position: fixed;
+  top: var(--nav-height);
+  left: 0;
+  bottom: 0;
+  width: min(330px, 88vw);
+  background: #0f172a;
+  border-right: 1px solid #1e3a5f;
+  transform: translateX(-105%);
+  transition: transform 0.25s ease;
+  z-index: 35;
+  overflow-y: auto;
+  padding: 12px;
+  box-shadow: 8px 0 24px rgba(0, 0, 0, 0.5);
+}
+
+#dr.o {
+  transform: translateX(0);
+}
+
+#dr a {
+  display: flex;
+  align-items: center;
+  padding: 12px;
+  border-radius: 8px;
+  color: #e2e8f0;
+  cursor: pointer;
+  min-height: 44px;
+  text-decoration: none;
+  font-size: 0.95rem;
+  font-weight: 500;
+  margin-bottom: 4px;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+#dr a:hover, #dr a:focus-visible {
+  background: rgba(255, 255, 255, 0.08);
+  outline: none;
+}
+
+#dr a.on {
+  background: rgba(0, 212, 255, 0.18);
+  color: #00d4ff;
+  font-weight: 700;
+  border-left: 3px solid #00d4ff;
+}
+
+/* Contenedor principal */
+.container {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 16px 14px;
+}
+
+.tab-panel {
+  display: none;
+  animation: fadeIn 0.25s ease;
+}
+
+.tab-panel.active {
+  display: block;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Encabezado Hero en INICIO */
+.hero-header {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-accent);
+  border-radius: 16px;
+  padding: 18px;
+  margin-bottom: 20px;
+}
+
+.hero-title-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.hero-logo-wrap {
+  width: 64px;
+  height: 64px;
+  flex-shrink: 0;
+  border-radius: 14px;
+  background: #060b19;
+  border: 1px solid #1e3a5f;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+}
+
+.hero-title {
+  font-size: clamp(1.35rem, 4.8vw, 2.15rem);
+  line-height: 1.2;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.hero-title span.author-tag {
+  display: inline-block;
+  color: var(--accent-primary);
+  font-weight: 700;
+}
+
+.hero-subtitle {
+  color: var(--text-secondary);
+  font-size: 1rem;
+}
+
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 10px 18px;
+  border-radius: 10px;
+  border: none;
+  background: linear-gradient(135deg, #38bdf8, #0284c7);
+  color: #04101d;
+  font-weight: 700;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 10px 18px;
+  border-radius: 10px;
+  border: 1px solid var(--border-accent);
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+.btn-secondary:hover, .btn-primary:hover {
+  transform: translateY(-1px);
+  border-color: var(--accent-primary);
+}
+
+/* Contenedor SVG Animado */
+.svg-stage {
+  width: 100%;
+  max-width: 440px;
+  margin: 14px auto;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid var(--border-accent);
+  background: #060b19;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+  position: relative;
+}
+
+.svg-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background: rgba(15, 23, 42, 0.9);
+  border-top: 1px solid var(--border-accent);
+  font-size: 0.8rem;
+  color: #94a3b8;
+}
+
+/* Tarjetas y Tipografía */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-accent);
+  border-radius: 14px;
+  padding: 18px;
+  margin-bottom: 18px;
+}
+
+h2.section-heading {
+  font-size: 1.55rem;
+  font-weight: 800;
+  margin-bottom: 14px;
+  color: var(--accent-primary);
+  border-bottom: 2px solid var(--border-accent);
+  padding-bottom: 8px;
+}
+
+h3 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin: 16px 0 8px 0;
+  color: var(--text-primary);
+}
+
+h4 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin: 12px 0 6px 0;
+  color: var(--accent-secondary);
+}
+
+p {
+  margin-bottom: 12px;
+}
+
+ul, ol {
+  margin-left: 20px;
+  margin-bottom: 14px;
+}
+
+li {
+  margin-bottom: 6px;
+}
+
+.badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  background: var(--accent-glow);
+  color: var(--accent-primary);
+  border: 1px solid var(--accent-primary);
+}
+
+.alert-box {
+  border-left: 4px solid var(--warning);
+  background: rgba(245, 158, 11, 0.1);
+  padding: 12px 14px;
+  border-radius: 0 10px 10px 0;
+  margin: 14px 0;
+}
+
+.info-box {
+  border-left: 4px solid var(--accent-primary);
+  background: var(--accent-glow);
+  padding: 12px 14px;
+  border-radius: 0 10px 10px 0;
+  margin: 14px 0;
+}
+
+/* Bloques de Código y Copiar */
+.code-wrapper {
+  position: relative;
+  margin: 12px 0 16px 0;
+  border-radius: 10px;
+  border: 1px solid var(--border-accent);
+  background: #060b19;
+  overflow: hidden;
+}
+
+.code-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 12px;
+  background: #111827;
+  border-bottom: 1px solid #1e3a5f;
+  font-size: 0.78rem;
+  color: #94a3b8;
+}
+
+.copy-btn {
+  min-height: 32px;
+  padding: 4px 12px;
+  border-radius: 6px;
+  border: 1px solid #38bdf8;
+  background: rgba(56, 189, 248, 0.15);
+  color: #38bdf8;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.copy-btn:hover {
+  background: #38bdf8;
+  color: #04101d;
+}
+
+pre {
+  padding: 12px;
+  overflow-x: auto;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.88rem;
+  color: #e2e8f0;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* Enlaces URL con botón obligatorio */
+.url-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border-accent);
+  background: var(--bg-elevated);
+  margin: 10px 0;
+}
+
+.url-text {
+  font-family: monospace;
+  font-size: 0.88rem;
+  color: var(--accent-primary);
+  word-break: break-all;
+}
+
+.url-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.btn-external {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 40px;
+  padding: 8px 14px;
+  border-radius: 8px;
+  background: var(--accent-primary);
+  color: #04101d;
+  font-weight: 700;
+  font-size: 0.85rem;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+}
+
+/* Tablas responsivas */
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  margin: 14px 0;
+  border-radius: 10px;
+  border: 1px solid var(--border-accent);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+  min-width: 480px;
+}
+
+th, td {
+  padding: 10px 12px;
+  text-align: left;
+  border-bottom: 1px solid var(--border-accent);
+}
+
+th {
+  background: var(--bg-elevated);
+  color: var(--accent-primary);
+  font-weight: 700;
+}
+
+/* Acordeones (33 Preguntas y Casos) */
+.qa-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+details.accordion {
+  background: var(--bg-card);
+  border: 1px solid var(--border-accent);
+  border-radius: 10px;
+  margin-bottom: 10px;
+  overflow: hidden;
+}
+
+details.accordion summary {
+  padding: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  list-style: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  min-height: 48px;
+}
+
+details.accordion summary::-webkit-details-marker {
+  display: none;
+}
+
+details.accordion summary::after {
+  content: "+";
+  font-size: 1.3rem;
+  color: var(--accent-primary);
+  font-weight: 800;
+  flex-shrink: 0;
+}
+
+details.accordion[open] summary::after {
+  content: "−";
+}
+
+details.accordion[open] summary {
+  border-bottom: 1px solid var(--border-accent);
+  background: var(--accent-glow);
+}
+
+.accordion-body {
+  padding: 14px;
+  color: var(--text-primary);
+}
+
+/* Checklist interactiva */
+.checklist-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border-accent);
+  background: var(--bg-elevated);
+  margin-bottom: 8px;
+  cursor: pointer;
+  min-height: 44px;
+}
+
+.checklist-item input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  accent-color: var(--accent-primary);
+  flex-shrink: 0;
+}
+
+/* Navegación inferior fija por pestaña */
+.tab-footer-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-top: 28px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border-accent);
+}
+
+/* Botones flotantes arrastrables (Inicio y Arriba) */
+.floating-draggable {
+  position: fixed;
+  z-index: 45;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  border: 2px solid var(--accent-primary);
+  background: rgba(15, 23, 42, 0.94);
+  color: var(--accent-primary);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.55);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.68rem;
+  font-weight: 800;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+}
+
+.floating-draggable:active {
+  cursor: grabbing;
+  transform: scale(0.95);
+}
+
+#btn-float-home {
+  bottom: 84px;
+  right: 14px;
+}
+
+#btn-float-top {
+  bottom: 22px;
+  right: 14px;
+}
+
+/* Toast de notificaciones */
+#toast {
+  position: fixed;
+  bottom: 22px;
+  left: 50%;
+  transform: translateX(-50%) translateY(100px);
+  background: #0f172a;
+  color: #38bdf8;
+  border: 1px solid #38bdf8;
+  padding: 10px 18px;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 0.88rem;
+  z-index: 60;
+  transition: transform 0.25s ease;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+  max-width: 90vw;
+  text-align: center;
+}
+
+#toast.show {
+  transform: translateX(-50%) translateY(0);
+}
+
+/* Resaltado de búsqueda */
+mark.search-hl {
+  background: #f59e0b;
+  color: #000;
+  padding: 0 2px;
+  border-radius: 3px;
+}
+
+/* Créditos destacados */
+.author-hero-box {
+  text-align: center;
+  padding: 24px 16px;
+  border-radius: 16px;
+  background: linear-gradient(145deg, #0f172a, #1e293b);
+  border: 2px solid var(--accent-primary);
+  margin: 18px 0;
+}
+
+.author-name-big {
+  font-size: clamp(1.9rem, 6vw, 2.8rem);
+  font-weight: 900;
+  background: linear-gradient(90deg, #38bdf8, #00d4ff, #818cf8);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 6px;
+}
+
+/* Optimización Samsung Galaxy A02s (360px) */
+@media (max-width: 380px) {
+  .container {
+    padding: 12px 10px;
+  }
+  .card {
+    padding: 14px 12px;
+  }
+  .hero-title-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .chip {
+    padding: 0 11px;
+    font-size: 0.82rem;
+  }
+}
+
+/* Respeto a prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Estilos de Impresión A4 */
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 14mm 12mm;
+  }
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+    padding: 0 !important;
+  }
+  .top-nav, .tools-bar, #dr, .floating-draggable, .tab-footer-nav, .copy-btn, .svg-controls, #toast {
+    display: none !important;
+  }
+  .tab-panel {
+    display: block !important;
+    opacity: 1 !important;
+    transform: none !important;
+    margin-bottom: 20px;
+  }
+  .card, .hero-header, .url-card, details.accordion, .checklist-item {
+    background: #ffffff !important;
+    color: #000000 !important;
+    border: 1px solid #cbd5e1 !important;
+    box-shadow: none !important;
+  }
+  pre {
+    background: #f8fafc !important;
+    color: #000000 !important;
+    border: 1px solid #cbd5e1 !important;
+    white-space: pre-wrap !important;
+  }
+  .author-name-big {
+    -webkit-text-fill-color: #000000 !important;
+    color: #000000 !important;
+  }
+}
+</style>
+</head>
+<body>
+
+<!-- Plantilla SVG Única Oculta (Hero & Créditos) -->
+<template id="hero-svg-template">
+  <svg viewBox="0 0 400 500" width="100%" height="auto" role="img" aria-label="Ilustración animada del flujo de conversión documental de MarkItDown: archivos PDF, Word, Excel y PowerPoint transformándose en conocimiento Markdown estructurado para Inteligencia Artificial">
+    <defs>
+      <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#050a18"/>
+        <stop offset="50%" stop-color="#0b1730"/>
+        <stop offset="100%" stop-color="#061024"/>
+      </linearGradient>
+      <linearGradient id="coreBeam" x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.1"/>
+        <stop offset="50%" stop-color="#00d4ff" stop-opacity="0.95"/>
+        <stop offset="100%" stop-color="#818cf8" stop-opacity="0.2"/>
+      </linearGradient>
+      <linearGradient id="mdShield" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#00d4ff"/>
+        <stop offset="100%" stop-color="#3b82f6"/>
+      </linearGradient>
+      <filter id="neonGlow" x="-25%" y="-25%" width="150%" height="150%">
+        <feGaussianBlur stdDeviation="4" result="blur"/>
+        <feMerge>
+          <feMergeNode in="blur"/>
+          <feMergeNode in="SourceGraphic"/>
+        </feMerge>
+      </filter>
+    </defs>
+
+    <!-- Fondo Profundo y Rejilla -->
+    <rect width="400" height="500" fill="url(#bgGrad)"/>
+    <g stroke="#1e3a5f" stroke-width="0.6" opacity="0.35">
+      <line x1="0" y1="80" x2="400" y2="80"/>
+      <line x1="0" y1="160" x2="400" y2="160"/>
+      <line x1="0" y1="240" x2="400" y2="240"/>
+      <line x1="0" y1="320" x2="400" y2="320"/>
+      <line x1="0" y1="400" x2="400" y2="400"/>
+      <line x1="80" y1="0" x2="80" y2="500"/>
+      <line x1="160" y1="0" x2="160" y2="500"/>
+      <line x1="240" y1="0" x2="240" y2="500"/>
+      <line x1="320" y1="0" x2="320" y2="500"/>
+    </g>
+
+    <!-- Anillos Orbitales de Energía -->
+    <g transform="translate(200, 245)">
+      <circle r="138" fill="none" stroke="#1e3a5f" stroke-width="1.5" stroke-dasharray="10 8">
+        <animateTransform attributeName="transform" type="rotate" from="0" to="360" dur="28s" repeatCount="indefinite"/>
+      </circle>
+      <circle r="105" fill="none" stroke="#00d4ff" stroke-width="1.2" stroke-dasharray="22 12" opacity="0.6">
+        <animateTransform attributeName="transform" type="rotate" from="360" to="0" dur="18s" repeatCount="indefinite"/>
+      </circle>
+      <circle r="72" fill="none" stroke="#818cf8" stroke-width="1.8" stroke-dasharray="6 6" opacity="0.8">
+        <animateTransform attributeName="transform" type="rotate" from="0" to="360" dur="12s" repeatCount="indefinite"/>
+      </circle>
+    </g>
+
+    <!-- Flujos de Entrada desde Documentos Heterogéneos -->
+    <g stroke="url(#coreBeam)" stroke-width="2.5" fill="none" filter="url(#neonGlow)">
+      <path d="M 75 95 Q 130 160 185 225" stroke-dasharray="8 6">
+        <animate attributeName="stroke-dashoffset" from="42" to="0" dur="1.6s" repeatCount="indefinite"/>
+      </path>
+      <path d="M 325 95 Q 270 160 215 225" stroke-dasharray="8 6">
+        <animate attributeName="stroke-dashoffset" from="42" to="0" dur="1.8s" repeatCount="indefinite"/>
+      </path>
+      <path d="M 65 215 L 170 242" stroke-dasharray="6 6">
+        <animate attributeName="stroke-dashoffset" from="36" to="0" dur="1.4s" repeatCount="indefinite"/>
+      </path>
+      <path d="M 335 215 L 230 242" stroke-dasharray="6 6">
+        <animate attributeName="stroke-dashoffset" from="36" to="0" dur="1.5s" repeatCount="indefinite"/>
+      </path>
+    </g>
+
+    <!-- Documentos Fuente Flotantes (PDF, DOCX, XLSX, PPTX) -->
+    <g transform="translate(36, 52)">
+      <animateTransform attributeName="transform" type="translate" values="36,52; 36,44; 36,52" dur="3.4s" repeatCount="indefinite"/>
+      <rect width="68" height="46" rx="8" fill="#0f172a" stroke="#ef4444" stroke-width="2"/>
+      <text x="34" y="21" fill="#fca5a5" font-size="11" font-weight="bold" text-anchor="middle" font-family="monospace">.PDF</text>
+      <text x="34" y="36" fill="#94a3b8" font-size="8" text-anchor="middle" font-family="sans-serif">Informe</text>
+    </g>
+
+    <g transform="translate(296, 52)">
+      <animateTransform attributeName="transform" type="translate" values="296,52; 296,60; 296,52" dur="3.8s" repeatCount="indefinite"/>
+      <rect width="68" height="46" rx="8" fill="#0f172a" stroke="#3b82f6" stroke-width="2"/>
+      <text x="34" y="21" fill="#93c5fd" font-size="11" font-weight="bold" text-anchor="middle" font-family="monospace">.DOCX</text>
+      <text x="34" y="36" fill="#94a3b8" font-size="8" text-anchor="middle" font-family="sans-serif">Word</text>
+    </g>
+
+    <g transform="translate(22, 186)">
+      <animateTransform attributeName="transform" type="translate" values="22,186; 22,178; 22,186" dur="4.1s" repeatCount="indefinite"/>
+      <rect width="68" height="46" rx="8" fill="#0f172a" stroke="#10b981" stroke-width="2"/>
+      <text x="34" y="21" fill="#6ee7b7" font-size="11" font-weight="bold" text-anchor="middle" font-family="monospace">.XLSX</text>
+      <text x="34" y="36" fill="#94a3b8" font-size="8" text-anchor="middle" font-family="sans-serif">Excel</text>
+    </g>
+
+    <g transform="translate(310, 186)">
+      <animateTransform attributeName="transform" type="translate" values="310,186; 310,194; 310,186" dur="3.6s" repeatCount="indefinite"/>
+      <rect width="68" height="46" rx="8" fill="#0f172a" stroke="#f59e0b" stroke-width="2"/>
+      <text x="34" y="21" fill="#fcd34d" font-size="11" font-weight="bold" text-anchor="middle" font-family="monospace">.PPTX</text>
+      <text x="34" y="36" fill="#94a3b8" font-size="8" text-anchor="middle" font-family="sans-serif">Slides</text>
+    </g>
+
+    <!-- Núcleo Procesador MarkItDown -->
+    <g transform="translate(200, 245)" filter="url(#neonGlow)">
+      <polygon points="0,-54 47,-27 47,27 0,54 -47,27 -47,-27" fill="#091326" stroke="url(#mdShield)" stroke-width="3">
+        <animate attributeName="stroke-width" values="2.5;4.5;2.5" dur="2.2s" repeatCount="indefinite"/>
+      </polygon>
+      <text x="0" y="-6" fill="#00d4ff" font-size="13" font-weight="900" text-anchor="middle" font-family="monospace">M ↓</text>
+      <text x="0" y="13" fill="#e2e8f0" font-size="9.5" font-weight="bold" text-anchor="middle" font-family="sans-serif">MarkItDown</text>
+      <text x="0" y="26" fill="#38bdf8" font-size="7.5" text-anchor="middle" font-family="monospace">v0.1.9</text>
+    </g>
+
+    <!-- Haz Descendente hacia Conocimiento Markdown / LLM -->
+    <line x1="200" y1="302" x2="200" y2="365" stroke="#00d4ff" stroke-width="3.5" stroke-dasharray="8 5" filter="url(#neonGlow)">
+      <animate attributeName="stroke-dashoffset" from="26" to="0" dur="1s" repeatCount="indefinite"/>
+    </line>
+
+    <!-- Tarjeta Salida Markdown & IA -->
+    <g transform="translate(75, 368)">
+      <rect width="250" height="98" rx="12" fill="#0f172a" stroke="#00d4ff" stroke-width="2"/>
+      <rect x="12" y="12" width="64" height="20" rx="5" fill="#00d4ff" fill-opacity="0.2"/>
+      <text x="44" y="25" fill="#00d4ff" font-size="10" font-weight="bold" text-anchor="middle" font-family="monospace">SALIDA .MD</text>
+      <text x="236" y="25" fill="#10b981" font-size="9.5" font-weight="bold" text-anchor="end" font-family="sans-serif">✓ LISTO PARA LLM / RAG</text>
+      <text x="16" y="48" fill="#38bdf8" font-size="11" font-weight="bold" font-family="monospace"># Conocimiento Estructurado</text>
+      <text x="16" y="65" fill="#cbd5e1" font-size="9.5" font-family="monospace">- Títulos, Tablas y Listas</text>
+      <text x="16" y="81" fill="#94a3b8" font-size="9" font-family="monospace">**Tokenización Óptima para IA**</text>
+    </g>
+
+    <!-- Partículas Luminosas Ascendentes -->
+    <circle cx="135" cy="340" r="2.5" fill="#38bdf8">
+      <animate attributeName="cy" values="355;305;355" dur="2.6s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0.2;1;0.2" dur="2.6s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="265" cy="340" r="2.5" fill="#818cf8">
+      <animate attributeName="cy" values="305;355;305" dur="2.9s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0.2;1;0.2" dur="2.9s" repeatCount="indefinite"/>
+    </circle>
+  </svg>
+</template>
+
+<!-- Barra Superior Fija -->
+<nav class="top-nav" aria-label="Navegación principal">
+  <button class="chip" id="mb" aria-label="Abrir índice" aria-expanded="false">☰ Índice</button>
+  <div class="nav-logo-box" id="nav-logo-home" title="Ir a Inicio" role="button" tabindex="0" aria-label="Logo Tutoriales IA - Ir a Inicio">
+    <!-- Integración SVG del Logo Tutoriales IA -->
+    <svg viewBox="0 0 100 100" width="30" height="30" aria-hidden="true">
+      <defs>
+        <linearGradient id="navLogoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#00f2fe"/>
+          <stop offset="100%" stop-color="#4facfe"/>
+        </linearGradient>
+      </defs>
+      <path d="M50 8 L88 22 L88 52 C88 74 70 88 50 95 C30 88 12 74 12 52 L12 22 Z" fill="none" stroke="url(#navLogoGrad)" stroke-width="5"/>
+      <path d="M46 24 C32 24 24 34 24 46 C24 58 32 68 46 68" fill="none" stroke="#38bdf8" stroke-width="4" stroke-linecap="round"/>
+      <path d="M54 24 L68 34 L68 58 L54 68" fill="none" stroke="#818cf8" stroke-width="4" stroke-linecap="round"/>
+      <circle cx="68" cy="34" r="3" fill="#00f2fe"/>
+      <circle cx="68" cy="58" r="3" fill="#00f2fe"/>
+      <polygon points="45,38 60,46 45,54" fill="url(#navLogoGrad)"/>
+    </svg>
+  </div>
+  <div class="tabs-scroll" id="tabs-bar" role="tablist">
+    <button class="chip active" role="tab" data-tab="0" aria-selected="true">Inicio</button>
+    <button class="chip" role="tab" data-tab="1" aria-selected="false">Entender MarkItDown</button>
+    <button class="chip" role="tab" data-tab="2" aria-selected="false">Preparar Windows 11</button>
+    <button class="chip" role="tab" data-tab="3" aria-selected="false">Instalación</button>
+    <button class="chip" role="tab" data-tab="4" aria-selected="false">Primera Conversión y CLI</button>
+    <button class="chip" role="tab" data-tab="5" aria-selected="false">10 Casos Prácticos</button>
+    <button class="chip" role="tab" data-tab="6" aria-selected="false">10 Proyectos</button>
+    <button class="chip" role="tab" data-tab="7" aria-selected="false">Automatización y Python</button>
+    <button class="chip" role="tab" data-tab="8" aria-selected="false">PROMPTS</button>
+    <button class="chip" role="tab" data-tab="9" aria-selected="false">33 Preguntas (Q&amp;A)</button>
+    <button class="chip" role="tab" data-tab="10" aria-selected="false">ERRORES</button>
+    <button class="chip" role="tab" data-tab="11" aria-selected="false">Glosario</button>
+    <button class="chip" role="tab" data-tab="12" aria-selected="false">FUENTES</button>
+    <button class="chip" role="tab" data-tab="13" aria-selected="false">Plan y Créditos</button>
+  </div>
+</nav>
+<div class="progress-bar" id="read-progress"></div>
+
+<!-- Cajón Lateral Índice -->
+<div id="dr" aria-label="Índice de secciones"></div>
+
+<!-- Barra de Utilidades y Buscador -->
+<div class="tools-bar">
+  <div class="search-box">
+    <input type="search" id="search-input" class="search-input" placeholder="Buscar comandos, errores, conceptos..." aria-label="Buscar en el tutorial">
+    <button type="button" id="search-clear" class="search-clear" aria-label="Limpiar búsqueda">✕</button>
+  </div>
+  <div class="utility-controls">
+    <button type="button" class="util-btn" id="font-dec" aria-label="Reducir tamaño de letra">A-</button>
+    <button type="button" class="util-btn" id="font-inc" aria-label="Aumentar tamaño de letra">A+</button>
+    <button type="button" class="util-btn" id="theme-toggle" aria-label="Cambiar tema claro/oscuro">🌓 Tema</button>
+    <button type="button" class="util-btn" id="print-btn" aria-label="Imprimir o guardar como PDF">🖨️ PDF</button>
+  </div>
+</div>
+
+<!-- Contenedor Principal de Pestañas -->
+<main class="container" id="main-content">
+
+  <!-- PESTAÑA 0: INICIO -->
+  <section class="tab-panel active" data-t="Inicio" id="tab-0">
+    <div class="hero-header">
+      <div class="hero-title-row">
+        <div class="hero-logo-wrap" aria-hidden="true">
+          <!-- Logo Tutoriales IA integrado en SVG junto al título en Inicio -->
+          <svg viewBox="0 0 120 120" width="54" height="54">
+            <defs>
+              <linearGradient id="heroLogoShield" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#00f2fe"/>
+                <stop offset="100%" stop-color="#3b82f6"/>
+              </linearGradient>
+              <linearGradient id="heroLogoText" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stop-color="#38bdf8"/>
+                <stop offset="100%" stop-color="#0284c7"/>
+              </linearGradient>
+            </defs>
+            <path d="M60 6 L104 22 L104 54 C104 78 84 94 60 102 C36 94 16 78 16 54 L16 22 Z" fill="#071329" stroke="url(#heroLogoShield)" stroke-width="4.5"/>
+            <path d="M55 24 C38 24 28 35 28 48 C28 61 38 72 55 72 M42 36 C36 36 34 42 38 48 C34 54 36 60 42 60" fill="none" stroke="#38bdf8" stroke-width="3.5" stroke-linecap="round"/>
+            <path d="M65 24 L82 34 L82 62 L65 72 M65 48 L88 48" fill="none" stroke="#818cf8" stroke-width="3.5" stroke-linecap="round"/>
+            <circle cx="82" cy="34" r="3.5" fill="#00f2fe"/>
+            <circle cx="88" cy="48" r="3.5" fill="#00f2fe"/>
+            <circle cx="82" cy="62" r="3.5" fill="#00f2fe"/>
+            <circle cx="60" cy="48" r="13" fill="#0a1936" stroke="#00f2fe" stroke-width="2.5"/>
+            <polygon points="56,42 67,48 56,54" fill="#00f2fe"/>
+            <text x="60" y="92" fill="url(#heroLogoText)" font-size="18" font-weight="900" text-anchor="middle" font-family="sans-serif">IA</text>
+            <text x="60" y="114" fill="#93c5fd" font-size="9.5" font-weight="800" text-anchor="middle" font-family="sans-serif" letter-spacing="1">TUTORIALES</text>
+          </svg>
+        </div>
+        <div>
+          <span class="badge">CURSO PRÁCTICO DE CERO A NIVEL PROFESIONAL</span>
+          <h1 class="hero-title">MarkItDown — De Documentos a Conocimiento Preparado para IA <span class="author-tag">by Rubén Sbarsky</span></h1>
+        </div>
+      </div>
+
+      <p class="hero-subtitle">Este curso enseña a instalar, utilizar, comprender y automatizar Microsoft MarkItDown en Windows 11. <strong>No necesitas conocimientos de programación.</strong> Aprenderás haciendo ejercicios reales, creando documentos, convirtiéndolos y comprobando los resultados.</p>
+
+      <div class="hero-actions">
+        <button type="button" class="btn-primary" id="start-course-btn">🚀 Comenzar el Tutorial</button>
+        <button type="button" class="btn-secondary" id="ix">☰ Ver índice</button>
+      </div>
+    </div>
+
+    <!-- Instancia SVG Hero -->
+    <div class="svg-stage" id="svg-host-home"></div>
+    <div class="svg-controls" style="max-width:440px;margin:-10px auto 18px auto;border-radius:0 0 12px 12px;">
+      <span>Arquitectura visual: Conversión a Markdown</span>
+      <button type="button" class="util-btn" id="toggle-anim-home" style="min-height:30px;font-size:0.78rem;">⏸ Pausar</button>
+    </div>
+
+    <div class="card">
+      <h2>¿Qué lograrás al terminar este curso?</h2>
+      <ul>
+        <li>Instalar MarkItDown correctamente en Windows 11.</li>
+        <li>Convertir documentos de diferentes formatos (PDF, Word, Excel, PowerPoint, HTML, CSV, JSON, imágenes y audio).</li>
+        <li>Preparar información limpia y estructurada para modelos de lenguaje (LLM).</li>
+        <li>Automatizar conversiones masivas por lotes.</li>
+        <li>Utilizar MarkItDown desde Python mediante su API oficial.</li>
+        <li>Crear bibliotecas documentales organizadas.</li>
+        <li>Comprender las posibilidades y límites de los sistemas RAG.</li>
+        <li>Detectar y solucionar 24 errores reales de conversión.</li>
+        <li>Trabajar con documentos de forma profesional y segura.</li>
+      </ul>
+      <div class="alert-box">
+        <strong>ADVERTENCIA PEDAGÓGICA:</strong> Este curso está diseñado para aprender haciendo. No necesitas saber programar. Sigue los pasos en orden, ejecuta los ejemplos y comprueba los resultados.
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Verificación Técnica de Referencia</h3>
+      <div class="table-responsive">
+        <table>
+          <thead>
+            <tr>
+              <th>Parámetro Técnico</th>
+              <th>Valor Verificado</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Fecha de consulta</strong></td>
+              <td>23/11/2026</td>
+            </tr>
+            <tr>
+              <td><strong>Versión de referencia de MarkItDown</strong></td>
+              <td>0.1.9</td>
+            </tr>
+            <tr>
+              <td><strong>Versión de Python de referencia</strong></td>
+              <td>Python 3.12 (didáctica, no la única compatible)</td>
+            </tr>
+            <tr>
+              <td><strong>Compatibilidad declarada por el proyecto</strong></td>
+              <td>Python 3.10 a 3.14</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="tab-footer-nav">
+      <span></span>
+      <button type="button" class="btn-primary next-tab-btn" data-next="1">Siguiente: Entender MarkItDown →</button>
+    </div>
+  </section>
+
+  <!-- PESTAÑA 1: ENTENDER MARKITDOWN -->
+  <section class="tab-panel" data-t="Entender MarkItDown" id="tab-1">
+    <div class="card">
+      <h2 class="section-heading">1. Entender MarkItDown</h2>
+      
+      <h3>1.1. ¿Qué es MarkItDown?</h3>
+      <p><strong>MarkItDown</strong> es una herramienta de Microsoft que permite convertir diferentes tipos de archivos en documentos Markdown.</p>
+      <p>Su finalidad principal es facilitar que la información contenida en documentos pueda ser utilizada por:</p>
+      <ul>
+        <li>Inteligencias artificiales.</li>
+        <li>Modelos de lenguaje.</li>
+        <li>Sistemas de búsqueda.</li>
+        <li>Sistemas de análisis documental.</li>
+        <li>Aplicaciones de procesamiento de información.</li>
+        <li>Sistemas RAG.</li>
+      </ul>
+      <p>Imagina que tienes cien documentos en formatos diferentes: PDF, Word, Excel, PowerPoint, HTML, CSV y JSON. Una inteligencia artificial puede trabajar con muchos de esos formatos, pero resulta muy útil disponer de una representación textual organizada y homogénea. Ahí aparece MarkItDown: extrae contenido y lo convierte a Markdown intentando conservar la estructura importante.</p>
+      <div class="alert-box">
+        <strong>IMPORTANTE:</strong> MarkItDown no convierte necesariamente un documento en una copia visual idéntica. Su prioridad es recuperar contenido y estructura para facilitar el análisis automatizado.
+      </div>
+
+      <h3>1.2. ¿Quién desarrolla MarkItDown?</h3>
+      <p>Microsoft mantiene el proyecto de código abierto bajo <strong>Licencia MIT</strong>, lo que significa que es software de código abierto con condiciones de utilización relativamente permisivas.</p>
+      <div class="url-card">
+        <span class="url-text">https://github.com/microsoft/markitdown</span>
+        <div class="url-actions">
+          <a href="https://github.com/microsoft/markitdown" target="_blank" rel="noopener noreferrer" class="btn-external">Abrir enlace en nueva ventana ↗</a>
+          <button type="button" class="copy-btn" data-copy="https://github.com/microsoft/markitdown">Copiar URL</button>
+        </div>
+      </div>
+
+      <h3>1.3. ¿Qué es Markdown?</h3>
+      <p>Markdown es una forma sencilla de escribir documentos estructurados utilizando texto normal y algunos símbolos. El símbolo <code>#</code> representa un título, los guiones <code>-</code> representan listas y los dos asteriscos <code>**</code> representan texto en negrita. No necesitas un programa especial para leer Markdown: puedes abrir un archivo <code>.md</code> con el Bloc de notas.</p>
+      <div class="code-wrapper">
+        <div class="code-header">
+          <span>Ejemplo de sintaxis Markdown</span>
+          <button type="button" class="copy-btn" data-copy="# Mi empresa&#10;&#10;## Servicios&#10;&#10;Ofrecemos los siguientes servicios:&#10;&#10;- Limpieza de oficinas.&#10;- Limpieza de comunidades.&#10;- Limpieza de cristales.&#10;&#10;**Contacto:** ejemplo@empresa.com">Copiar</button>
+        </div>
+        <pre># Mi empresa
+
+## Servicios
+
+Ofrecemos los siguientes servicios:
+
+- Limpieza de oficinas.
+- Limpieza de comunidades.
+- Limpieza de cristales.
+
+**Contacto:** ejemplo@empresa.com</pre>
+      </div>
+
+      <h3>1.4. ¿Por qué es útil para la IA?</h3>
+      <p>Los modelos de lenguaje trabajan principalmente con información textual. Markdown permite representar títulos, subtítulos, párrafos, listas, tablas, enlaces y bloques de código. Esto facilita identificar la organización de la información: una tabla de Excel se convierte en tabla Markdown, una presentación en sucesión de títulos y contenidos, y un Word en estructura de encabezados y párrafos, liberando el dato de su apariencia visual original.</p>
+
+      <h3>1.5. Diferencias entre formatos</h3>
+      <ul>
+        <li><strong>PDF:</strong> Formato de documento cuya apariencia está diseñada para conservarse.</li>
+        <li><strong>DOCX:</strong> Formato de documentos de Microsoft Word.</li>
+        <li><strong>XLSX:</strong> Formato de hojas de cálculo de Microsoft Excel.</li>
+        <li><strong>PPTX:</strong> Formato de presentaciones de Microsoft PowerPoint.</li>
+        <li><strong>MD:</strong> Documento Markdown (representa principalmente contenido textual estructurado).</li>
+      </ul>
+
+      <h3>1.6. Cómo funciona MarkItDown</h3>
+      <div class="code-wrapper">
+        <div class="code-header"><span>Flujo interno de procesamiento</span></div>
+        <pre>ARCHIVO ORIGINAL
+       |
+       v
+MARKITDOWN
+       |
+       v
+1. IDENTIFICACIÓN DEL FORMATO (determina qué tipo de archivo recibe)
+       |
+       v
+2. LECTURA DEL CONTENIDO (utiliza los mecanismos correspondientes al formato)
+       |
+       v
+3. EXTRACCIÓN DE INFORMACIÓN (recupera el contenido que puede interpretar)
+       |
+       v
+4. CONVERSIÓN A MARKDOWN (representa el contenido en Markdown)
+       |
+       v
+5. REVISIÓN (comprobamos que no haya información perdida o mal interpretada)
+       |
+       v
+6. APLICACIÓN: IA / ANÁLISIS / BÚSQUEDA</pre>
+      </div>
+
+      <h3>1.7. Qué puede conservar y qué puede perder</h3>
+      <div class="table-responsive">
+        <table>
+          <thead>
+            <tr>
+              <th>Puede conservar (según formato)</th>
+              <th>Puede perder o simplificar</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Texto, títulos, listas, tablas, enlaces, determinados metadatos y orden de determinados elementos.</td>
+              <td>Colores, tipografías, posiciones exactas, animaciones, diseños complejos, información visual, elementos gráficos y relaciones espaciales.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p><em>Una conversión no debe considerarse una copia fiel del original.</em></p>
+
+      <h3>1.8. Ventajas frente a copiar y pegar</h3>
+      <ul>
+        <li><strong>Copiar manualmente:</strong> Consume tiempo, introduce errores, es difícil de repetir y no resulta práctico para cientos de documentos.</li>
+        <li><strong>MarkItDown:</strong> Automatiza la extracción, procesa diferentes formatos, facilita conversiones repetitivas, permite integrarlo con Python y prepara información para IA.</li>
+      </ul>
+
+      <h3>1.9. Preparar documentos para una LLM</h3>
+      <p><strong>LLM</strong> significa <em>Large Language Model</em> (modelo de lenguaje grande), como ChatGPT, Claude, Gemini o modelos locales ejecutados con Ollama. Preparar documentos significa convertirlos y organizarlos para facilitar su análisis. <strong>IMPORTANTE:</strong> Convertir un documento no garantiza que una IA comprenda correctamente toda su información; siempre debemos comprobar los resultados.</p>
+
+      <h3>1.10. Para qué me puede servir</h3>
+      <div class="table-responsive">
+        <table>
+          <thead>
+            <tr>
+              <th>NECESIDAD</th>
+              <th>MARKITDOWN</th>
+              <th>QUÉ MÁS NECESITARÉ</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Analizar PDF</td><td>Extraer texto</td><td>OCR si está escaneado</td></tr>
+            <tr><td>Leer Word</td><td>Extraer contenido</td><td>Revisión</td></tr>
+            <tr><td>Analizar Excel</td><td>Convertir hojas</td><td>Validar fórmulas y datos</td></tr>
+            <tr><td>Analizar PowerPoint</td><td>Extraer texto</td><td>Revisión visual</td></tr>
+            <tr><td>Procesar HTML</td><td>Extraer contenido</td><td>Navegador para webs dinámicas</td></tr>
+            <tr><td>Analizar CSV</td><td>Convertir estructura</td><td>Análisis estadístico si procede</td></tr>
+            <tr><td>Analizar JSON</td><td>Convertir contenido</td><td>Herramienta de análisis si procede</td></tr>
+            <tr><td>Crear biblioteca</td><td>Convertir documentos</td><td>Organización</td></tr>
+            <tr><td>Crear RAG</td><td>Preparar documentos</td><td>Base vectorial y sistema RAG</td></tr>
+            <tr><td>Automatizar</td><td>Ofrece CLI y API</td><td>Scripts o aplicaciones</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>1.11. Formatos admitidos y dependencias</h3>
+      <div class="table-responsive">
+        <table>
+          <thead>
+            <tr>
+              <th>Formato</th>
+              <th>Extensión</th>
+              <th>Capacidades, Dependencias y Limitaciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>PDF</strong></td><td><code>.pdf</code></td><td>Extracción de texto. Dependencia opcional: <code>pdf</code>. Limitación: PDF escaneado puede necesitar OCR.</td></tr>
+            <tr><td><strong>Word</strong></td><td><code>.docx</code></td><td>Extracción de texto y estructura. Dependencia: <code>docx</code>. Puede perder diseño y elementos visuales.</td></tr>
+            <tr><td><strong>PowerPoint</strong></td><td><code>.pptx</code></td><td>Extracción de contenido de diapositivas. Dependencia: <code>pptx</code>. Puede perder animaciones y distribución visual.</td></tr>
+            <tr><td><strong>Excel</strong></td><td><code>.xlsx</code>, <code>.xls</code></td><td>Extracción de hojas y tablas. Dependencias: <code>xlsx</code> y <code>xls</code>. Las fórmulas y gráficos requieren especial atención.</td></tr>
+            <tr><td><strong>HTML</strong></td><td><code>.html</code>, <code>.htm</code></td><td>Extracción de contenido. Incluido en dependencias básicas. No ejecuta necesariamente JavaScript ni reproduce una web completa.</td></tr>
+            <tr><td><strong>CSV</strong></td><td><code>.csv</code></td><td>Extracción de datos tabulares. Funcionalidad básica.</td></tr>
+            <tr><td><strong>JSON</strong></td><td><code>.json</code></td><td>Extracción de contenido estructurado. Funcionalidad básica.</td></tr>
+            <tr><td><strong>XML</strong></td><td><code>.xml</code></td><td>Extracción de contenido estructurado. Funcionalidad básica.</td></tr>
+            <tr><td><strong>Imágenes</strong></td><td><code>.jpg</code>, <code>.jpeg</code>, <code>.png</code></td><td>Puede extraer metadatos EXIF. La descripción mediante IA depende de servicios y configuración externos.</td></tr>
+            <tr><td><strong>Audio</strong></td><td><code>.wav</code>, <code>.mp3</code></td><td>Metadatos y transcripción según configuración. Dependencia opcional: <code>audio-transcription</code>.</td></tr>
+            <tr><td><strong>YouTube</strong></td><td>URL de vídeo</td><td>Puede recuperar transcripciones. Dependencia: <code>youtube-transcription</code>. No equivale a descargar ni interpretar cualquier vídeo.</td></tr>
+            <tr><td><strong>ZIP</strong></td><td><code>.zip</code></td><td>Puede iterar sobre su contenido. No significa que convierta automáticamente cualquier formato incluido.</td></tr>
+            <tr><td><strong>EPUB</strong></td><td><code>.epub</code></td><td>Formato de libros electrónicos. Consultar compatibilidad concreta de la versión instalada.</td></tr>
+            <tr><td><strong>Outlook</strong></td><td>Mensajes compatibles</td><td>Archivos de mensajes compatibles. Dependencia opcional: <code>outlook</code>.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p><em>La disponibilidad concreta depende de las dependencias instaladas, la versión y el contenido del archivo.</em></p>
+    </div>
+
+    <div class="tab-footer-nav">
+      <button type="button" class="btn-secondary prev-tab-btn" data-prev="0">← Anterior: Inicio</button>
+      <button type="button" class="btn-primary next-tab-btn" data-next="2">Siguiente: Preparar Windows 11 →</button>
+    </div>
+  </section>
+
+  <!-- PESTAÑA 2: PREPARAR WINDOWS 11 -->
+  <section class="tab-panel" data-t="Preparar Windows 11" id="tab-2">
+    <div class="card">
+      <h2 class="section-heading">2. Preparar Windows 11</h2>
+
+      <h3>Conceptos básicos antes de empezar</h3>
+      <ul>
+        <li><strong>2.1. Python:</strong> Lenguaje de programación que permite dar instrucciones al ordenador para ejecutar MarkItDown y automatizar conversiones.</li>
+        <li><strong>2.2. PowerShell:</strong> Herramienta de Windows que permite escribir instrucciones (comandos) para el ordenador en lugar de hacer todo mediante clics.</li>
+        <li><strong>2.3. Terminal:</strong> Ventana donde escribimos instrucciones.</li>
+        <li><strong>2.4. Pip:</strong> Instalador de paquetes de Python que utilizaremos para instalar MarkItDown.</li>
+        <li><strong>2.5. Entorno virtual:</strong> Espacio independiente donde instalamos las herramientas necesarias para un proyecto (como una caja de herramientas exclusiva para MarkItDown), evitando mezclar sus componentes con otros proyectos.</li>
+        <li><strong>2.6. PATH:</strong> Variable de Windows que contiene ubicaciones donde el sistema busca programas. Si Python no está bien configurado, Windows puede no encontrarlo.</li>
+        <li><strong>2.7. Biblioteca, paquete y dependencia:</strong> <em>Biblioteca</em> es un conjunto de funciones reutilizables; <em>Paquete</em> es una unidad instalable de software; <em>Dependencia</em> es un componente que otro programa necesita para funcionar.</li>
+      </ul>
+
+      <h3>2.8. Abrir PowerShell</h3>
+      <ol>
+        <li>Pulsa el botón <strong>Inicio</strong> de Windows.</li>
+        <li>Escribe <code>PowerShell</code>.</li>
+        <li>Selecciona <strong>Windows PowerShell</strong> o <strong>PowerShell</strong>.</li>
+        <li>Aparecerá una ventana con una línea de comandos. No cierres todavía esa ventana.</li>
+      </ol>
+
+      <h3>2.9. Comprobar Windows</h3>
+      <p>Escribe el siguiente comando y pulsa Enter. Aparecerá una ventana con información de tu versión de Windows:</p>
+      <div class="code-wrapper">
+        <div class="code-header"><span>PowerShell — Versión de Windows</span><button type="button" class="copy-btn" data-copy="winver">Copiar</button></div>
+        <pre>winver</pre>
+      </div>
+
+      <h3>2.10. Comprobar Python y Pip</h3>
+      <p>Comprueba si Python está instalado (debería aparecer algo parecido a <code>Python 3.12.0</code>) y verifica <code>pip</code>:</p>
+      <div class="code-wrapper">
+        <div class="code-header"><span>PowerShell — Verificar Python y Pip</span><button type="button" class="copy-btn" data-copy="py --version&#10;python --version&#10;py -m pip --version">Copiar</button></div>
+        <pre>py --version
+python --version
+py -m pip --version</pre>
+      </div>
+
+      <h3>2.11. Identificar instalaciones registradas</h3>
+      <p>Este comando permite identificar las instalaciones de Python registradas en el lanzador de Windows. Si aparece un mensaje indicando que <code>py</code> no se reconoce, comprueba la instalación del lanzador o utiliza el instalador oficial:</p>
+      <div class="code-wrapper">
+        <div class="code-header"><span>PowerShell — Listar versiones de Python</span><button type="button" class="copy-btn" data-copy="py -0p">Copiar</button></div>
+        <pre>py -0p</pre>
+      </div>
+
+      <h3>2.12. Problema de Microsoft Store (Alias de ejecución)</h3>
+      <p>A veces Windows intenta abrir Microsoft Store cuando escribimos <code>python</code> debido a los alias de ejecución de aplicaciones. Para comprobarlo:</p>
+      <ol>
+        <li>Abre <strong>Configuración</strong> en Windows 11.</li>
+        <li>Entra en <strong>Aplicaciones</strong>.</li>
+        <li>Busca <strong>Configuración avanzada de aplicaciones</strong>.</li>
+        <li>Entra en <strong>Alias de ejecución de aplicaciones</strong>.</li>
+        <li>Comprueba los alias de Python. No desactives opciones al azar. Si tienes una instalación válida de Python y el alias de Store interfiere, desactiva el alias correspondiente y vuelve a ejecutar <code>python --version</code>.</li>
+      </ol>
+
+      <h3>2.13. Instalar Python oficialmente</h3>
+      <div class="url-card">
+        <span class="url-text">https://www.python.org/downloads/windows/</span>
+        <div class="url-actions">
+          <a href="https://www.python.org/downloads/windows/" target="_blank" rel="noopener noreferrer" class="btn-external">Abrir enlace en nueva ventana ↗</a>
+          <button type="button" class="copy-btn" data-copy="https://www.python.org/downloads/windows/">Copiar URL</button>
+        </div>
+      </div>
+      <ol>
+        <li>Abre el navegador y accede a la página oficial de descargas de Python para Windows.</li>
+        <li>Descarga una versión compatible (recomendada 3.12).</li>
+        <li>Ejecuta el instalador y sigue las instrucciones.</li>
+        <li>Si aparece la opción <strong>Add Python to PATH</strong>, actívala.</li>
+        <li>Completa la instalación y abre una nueva ventana de PowerShell.</li>
+        <li>Comprueba ejecutando <code>py --version</code> y <code>py -m pip --version</code>. No es necesario instalar todas las versiones de Python.</li>
+      </ol>
+    </div>
+
+    <div class="tab-footer-nav">
+      <button type="button" class="btn-secondary prev-tab-btn" data-prev="1">← Anterior: Entender MarkItDown</button>
+      <button type="button" class="btn-primary next-tab-btn" data-next="3">Siguiente: Instalación →</button>
+    </div>
+  </section>
+
+  <!-- PESTAÑA 3: INSTALACIÓN -->
+  <section class="tab-panel" data-t="Instalación" id="tab-3">
+    <div class="card">
+      <h2 class="section-heading">3. Instalación de MarkItDown</h2>
+
+      <h3>3.1. Crear la carpeta de trabajo</h3>
+      <p>En PowerShell, creamos la carpeta <code>C:\MarkItDownCurso</code>, entramos en ella y verificamos nuestra ubicación:</p>
+      <div class="code-wrapper">
+        <div class="code-header"><span>PowerShell — Crear y entrar en carpeta</span><button type="button" class="copy-btn" data-copy="New-Item -ItemType Directory -Path &quot;C:\MarkItDownCurso&quot; -Force&#10;Set-Location &quot;C:\MarkItDownCurso&quot;&#10;Get-Location">Copiar</button></div>
+        <pre>New-Item -ItemType Directory -Path "C:\MarkItDownCurso" -Force
+Set-Location "C:\MarkItDownCurso"
+Get-Location</pre>
+      </div>
+      <p>Debe aparecer en pantalla: <code>C:\MarkItDownCurso</code>.</p>
+
+      <h3>3.2. Crear y activar un entorno virtual</h3>
+      <p>Creamos un entorno virtual llamado <code>.venv</code> y lo activamos. Si PowerShell bloquea el script, aplicamos una política temporal únicamente al proceso actual:</p>
+      <div class="code-wrapper">
+        <div class="code-header"><span>PowerShell — Crear y activar .venv</span><button type="button" class="copy-btn" data-copy="py -3.12 -m venv .venv&#10;.\.venv\Scripts\Activate.ps1">Copiar</button></div>
+        <pre>py -3.12 -m venv .venv
+.\.venv\Scripts\Activate.ps1</pre>
+      </div>
+      <p>Si funciona, aparecerá el indicador <code>(.venv) PS C:\MarkItDownCurso&gt;</code>. Si PowerShell bloquea la ejecución del script, ejecuta:</p>
+      <div class="code-wrapper">
+        <div class="code-header"><span>PowerShell — Solución a bloqueo de Activate.ps1</span><button type="button" class="copy-btn" data-copy="Get-ExecutionPolicy -List&#10;Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass&#10;.\.venv\Scripts\Activate.ps1">Copiar</button></div>
+        <pre>Get-ExecutionPolicy -List
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+.\.venv\Scripts\Activate.ps1</pre>
+      </div>
+      <p><em>Esta modificación afecta únicamente a esa sesión de PowerShell. No es necesario desactivar permanentemente las medidas de seguridad.</em></p>
+
+      <h3>3.3. Actualizar Pip</h3>
+      <p>Con el entorno <code>(.venv)</code> activado, actualiza <code>pip</code> antes de instalar:</p>
+      <div class="code-wrapper">
+        <div class="code-header"><span>PowerShell — Actualizar pip</span><button type="button" class="copy-btn" data-copy="python -m pip install --upgrade pip">Copiar</button></div>
+        <pre>python -m pip install --upgrade pip</pre>
+      </div>
+
+      <h3>3.4. Instalar MarkItDown</h3>
+      <p>Para este curso recomendamos la <strong>instalación completa</strong> para trabajar con todos los formatos. En entornos profesionales conviene instalar solo las dependencias necesarias:</p>
+      <div class="code-wrapper">
+        <div class="code-header"><span>PowerShell — Opciones de instalación</span><button type="button" class="copy-btn" data-copy="python -m pip install &quot;markitdown[all]&quot;">Copiar completa</button></div>
+        <pre># Instalación básica:
+python -m pip install markitdown
+
+# Instalación completa (recomendada para este curso):
+python -m pip install "markitdown[all]"
+
+# Instalación selectiva:
+python -m pip install "markitdown[pdf,docx,pptx,xlsx,xls]"</pre>
+      </div>
+      <div class="info-box">
+        <strong>Extras disponibles en la versión consultada (0.1.9):</strong><br>
+        <code>all</code>, <code>pptx</code>, <code>docx</code>, <code>xlsx</code>, <code>xls</code>, <code>pdf</code>, <code>outlook</code>, <code>audio-transcription</code>, <code>youtube-transcription</code>, <code>az-doc-intel</code>, <code>az-content-understanding</code>.<br>
+        <em>Los extras son conjuntos de dependencias opcionales, no programas independientes.</em>
+      </div>
+
+      <h3>3.5. Comprobar la instalación</h3>
+      <div class="code-wrapper">
+        <div class="code-header"><span>PowerShell — Verificación de MarkItDown</span><button type="button" class="copy-btn" data-copy="python -m pip show markitdown&#10;Get-Command markitdown&#10;markitdown --help&#10;markitdown --list-plugins">Copiar</button></div>
+        <pre>python -m pip show markitdown
+Get-Command markitdown
+markitdown --help
+markitdown --list-plugins</pre>
+      </div>
+      <p><em>Nota: Si no hay plugins instalados al ejecutar <code>--list-plugins</code>, no significa que MarkItDown esté averiado.</em></p>
+
+      <h3>3.6. Desinstalar y reinstalar</h3>
+      <p>Para desinstalar el paquete, eliminar por completo el entorno virtual (sin borrar tus documentos fuera de <code>.venv</code>) o reinstalar desde cero:</p>
+      <div class="code-wrapper">
+        <div class="code-header"><span>PowerShell — Desinstalar, limpiar y reinstalar</span><button type="button" class="copy-btn" data-copy="python -m pip uninstall markitdown&#10;deactivate&#10;Remove-Item -Recurse -Force &quot;.venv&quot;&#10;py -3.12 -m venv .venv&#10;.\.venv\Scripts\Activate.ps1&#10;python -m pip install --upgrade pip&#10;python -m pip install &quot;markitdown[all]&quot;">Copiar</button></div>
+        <pre># Desinstalar paquete:
+python -m pip uninstall markitdown
+
+# Eliminar entorno completo:
+deactivate
+Remove-Item -Recurse -Force ".venv"
+
+# Reinstalar desde cero:
+py -3.12 -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install --upgrade pip
+python -m pip install "markitdown[all]"</pre>
+      </div>
+    </div>
+
+    <div class="tab-footer-nav">
+      <button type="button" class="btn-secondary prev-tab-btn" data-prev="2">← Anterior: Preparar Windows 11</button>
+      <button type="button" class="btn-primary next-tab-btn" data-next="4">Siguiente: Primera Conversión y CLI →</button>
+    </div>
+  </section>
+
+  <!-- PESTAÑA 4: PRIMERA CONVERSIÓN Y CLI -->
+  <section class="tab-panel" data-t="Primera Conversión y CLI" id="tab-4">
+    <div class="card">
+      <h2 class="section-heading">4. Primera Conversión</h2>
+      <p><strong>Objetivo:</strong> Convertir un archivo de texto en Markdown paso a paso.</p>
+      <ol>
+        <li>Abre PowerShell, activa el entorno virtual y entra en la carpeta <code>C:\MarkItDownCurso</code>.</li>
+        <li>Crea un archivo de prueba llamado <code>primer_documento.txt</code>, comprueba que existe, conviértelo y ábrelo en el Bloc de notas:</li>
+      </ol>
+      <div class="code-wrapper">
+        <div class="code-header"><span>PowerShell — Primera conversión completa</span><button type="button" class="copy-btn" data-copy="Set-Location &quot;C:\MarkItDownCurso&quot;&#10;@'&#10;MI PRIMER DOCUMENTO&#10;&#10;MarkItDown es una herramienta de Microsoft.&#10;&#10;Permite convertir documentos a Markdown.&#10;&#10;OBJETIVOS&#10;&#10;- Aprender a convertir documentos.&#10;- Preparar información para IA.&#10;- Automatizar tareas.&#10;'@ | Set-Content -Path &quot;.\primer_documento.txt&quot; -Encoding utf8&#10;Get-ChildItem&#10;markitdown &quot;.\primer_documento.txt&quot; -o &quot;.\primer_documento.md&quot;&#10;notepad &quot;.\primer_documento.md&quot;">Copiar</button></div>
+        <pre>Set-Location "C:\MarkItDownCurso"
+
+@'
+MI PRIMER DOCUMENTO
+
+MarkItDown es una herramienta de Microsoft.
+
+Permite convertir documentos a Markdown.
+
+OBJETIVOS
+
+- Aprender a convertir documentos.
+- Preparar información para IA.
+- Automatizar tareas.
+'@ | Set-Content -Path ".\primer_documento.txt" -Encoding utf8
+
+Get-ChildItem
+markitdown ".\primer_documento.txt" -o ".\primer_documento.md"
+notepad ".\primer_documento.md"</pre>
+      </div>
+
+      <h3>Comprender el comando y la alternativa con redirección</h3>
+      <ul>
+        <li><code>markitdown</code>: Ejecuta la herramienta.</li>
+        <li><code>".\primer_documento.txt"</code>: Indica el archivo de entrada.</li>
+        <li><code>-o</code>: Opción propia de MarkItDown para especificar el archivo de salida.</li>
+        <li><code>".\primer_documento.md"</code>: Nombre del archivo resultado.</li>
+      </ul>
+      <div class="code-wrapper">
+        <div class="code-header"><span>Alternativa con redirección de PowerShell</span><button type="button" class="copy-btn" data-copy="markitdown &quot;.\primer_documento.txt&quot; &gt; &quot;.\resultado.md&quot;">Copiar</button></div>
+        <pre>markitdown ".\primer_documento.txt" > ".\resultado.md"</pre>
+      </div>
+      <p><strong>Diferencia:</strong> <code>-o</code> es una opción propia de MarkItDown; <code>&gt;</code> es un mecanismo de salida estándar de PowerShell. Para este curso recomendamos utilizar <code>-o</code>.</p>
+    </div>
+
+    <div class="card">
+      <h2 class="section-heading">5. Utilización mediante Línea de Comandos (CLI)</h2>
+
+      <h3>5.1. Convertir un archivo</h3>
+      <div class="code-wrapper">
+        <div class="code-header"><span>Conversión directa</span><button type="button" class="copy-btn" data-copy="markitdown &quot;.\documento.pdf&quot; -o &quot;.\documento.md&quot;">Copiar</button></div>
+        <pre>markitdown ".\documento.pdf" -o ".\documento.md"</pre>
+      </div>
+
+      <h3>5.2. Rutas con espacios</h3>
+      <p>Las comillas permiten utilizar rutas que contienen espacios sin errores de interpretación:</p>
+      <div class="code-wrapper">
+        <div class="code-header"><span>Rutas entrecomilladas</span><button type="button" class="copy-btn" data-copy="markitdown &quot;C:\Mis documentos\Informe anual.pdf&quot; -o &quot;C:\Mis documentos\Informe anual.md&quot;">Copiar</button></div>
+        <pre>markitdown "C:\Mis documentos\Informe anual.pdf" -o "C:\Mis documentos\Informe anual.md"</pre>
+      </div>
+
+      <h3>5.3. Consultar ayuda</h3>
+      <div class="code-wrapper">
+        <div class="code-header"><span>Ayuda CLI</span><button type="button" class="copy-btn" data-copy="markitdown --help">Copiar</button></div>
+        <pre>markitdown --help</pre>
+      </div>
+
+      <h3>5.4. Evitar sobrescribir archivos existentes</h3>
+      <p>Si <code>Test-Path ".\resultado.md"</code> devuelve <code>True</code>, el archivo ya existe. Usa esta comprobación para proteger resultados previos:</p>
+      <div class="code-wrapper">
+        <div class="code-header"><span>PowerShell — Protección contra sobrescritura</span><button type="button" class="copy-btn" data-copy="Test-Path &quot;.\resultado.md&quot;&#10;if (Test-Path &quot;.\resultado.md&quot;) {&#10;    Write-Host &quot;El archivo ya existe. No se realizará la conversión.&quot;&#10;}&#10;else {&#10;    markitdown &quot;.\documento.pdf&quot; -o &quot;.\resultado.md&quot;&#10;}">Copiar</button></div>
+        <pre>Test-Path ".\resultado.md"
+
+if (Test-Path ".\resultado.md") {
+    Write-Host "El archivo ya existe. No se realizará la conversión."
+}
+else {
+    markitdown ".\documento.pdf" -o ".\resultado.md"
+}</pre>
+      </div>
+
+      <h3>5.5. Procesar varios archivos por lotes</h3>
+      <p>Crea las carpetas <code>originales</code> y <code>markdown</code> y convierte automáticamente todos los PDF sin sobrescribir los ya convertidos:</p>
+      <div class="code-wrapper">
+        <div class="code-header"><span>PowerShell — Conversión masiva de PDF</span><button type="button" class="copy-btn" data-copy="New-Item -ItemType Directory -Path &quot;.\originales&quot; -Force&#10;New-Item -ItemType Directory -Path &quot;.\markdown&quot; -Force&#10;&#10;Get-ChildItem &quot;.\originales&quot; -Filter &quot;*.pdf&quot; -File | ForEach-Object {&#10;    $salida = Join-Path &quot;.\markdown&quot; ($_.BaseName + &quot;.md&quot;)&#10;&#10;    if (-not (Test-Path $salida)) {&#10;        markitdown $_.FullName -o $salida&#10;    }&#10;}">Copiar</button></div>
+        <pre>New-Item -ItemType Directory -Path ".\originales" -Force
+New-Item -ItemType Directory -Path ".\markdown" -Force
+
+Get-ChildItem ".\originales" -Filter "*.pdf" -File | ForEach-Object {
+    $salida = Join-Path ".\markdown" ($_.BaseName + ".md")
+
+    if (-not (Test-Path $salida)) {
+        markitdown $_.FullName -o $salida
+    }
+}</pre>
+      </div>
+    </div>
+
+    <div class="tab-footer-nav">
+      <button type="button" class="btn-secondary prev-tab-btn" data-prev="3">← Anterior: Instalación</button>
+      <button type="button" class="btn-primary next-tab-btn" data-next="5">Siguiente: 10 Casos Prácticos →</button>
+    </div>
+  </section>
+
+  <!-- PESTAÑA 5: 10 CASOS PRÁCTICOS -->
+  <section class="tab-panel" data-t="10 Casos Prácticos" id="tab-5">
+    <div class="card">
+      <h2 class="section-heading">6. Los Diez Casos de Uso Guiados (10 Casos Prácticos)</h2>
+      <p>Ejecuta cada caso práctico paso a paso en PowerShell con tu entorno virtual <code>(.venv)</code> activo.</p>
+
+      <!-- CASO 1 -->
+      <details class="accordion" open>
+        <summary>Caso 1. Convertir un archivo de texto (.TXT)</summary>
+        <div class="accordion-body">
+          <p><strong>Objetivo:</strong> Comprender el proceso básico.</p>
+          <div class="code-wrapper">
+            <div class="code-header"><span>PowerShell — Caso 1</span><button type="button" class="copy-btn" data-copy="Set-Location &quot;C:\MarkItDownCurso&quot;&#10;@'&#10;# Proyecto de investigación&#10;&#10;Este proyecto estudia el uso de inteligencia artificial.&#10;&#10;## Objetivos&#10;&#10;- Organizar documentos.&#10;- Extraer información.&#10;- Preparar contenido para modelos de lenguaje.&#10;'@ | Set-Content &quot;.\proyecto.txt&quot; -Encoding utf8&#10;markitdown &quot;.\proyecto.txt&quot; -o &quot;.\proyecto.md&quot;&#10;notepad &quot;.\proyecto.md&quot;&#10;Get-Content &quot;.\proyecto.md&quot;">Copiar</button></div>
+            <pre>Set-Location "C:\MarkItDownCurso"
+
+@'
+# Proyecto de investigación
+
+Este proyecto estudia el uso de inteligencia artificial.
+
+## Objetivos
+
+- Organizar documentos.
+- Extraer información.
+- Preparar contenido para modelos de lenguaje.
+'@ | Set-Content ".\proyecto.txt" -Encoding utf8
+
+markitdown ".\proyecto.txt" -o ".\proyecto.md"
+notepad ".\proyecto.md"
+Get-Content ".\proyecto.md"</pre>
+          </div>
+          <p><strong>Resultado esperado:</strong> Un archivo Markdown con el contenido original. <strong>Errores:</strong> Si el archivo no existe, comprueba la carpeta; si MarkItDown no se reconoce, comprueba que el entorno está activado.</p>
+          <p><strong>Reto y Solución:</strong> Crea otro documento sobre un tema que te interese y conviértelo utilizando el mismo procedimiento cambiando los nombres de los archivos.</p>
+        </div>
+      </details>
+
+      <!-- CASO 2 -->
+      <details class="accordion">
+        <summary>Caso 2. Convertir un PDF (.PDF)</summary>
+        <div class="accordion-body">
+          <p><strong>Objetivo:</strong> Extraer información de documentos PDF.</p>
+          <div class="code-wrapper">
+            <div class="code-header"><span>PowerShell — Caso 2</span><button type="button" class="copy-btn" data-copy="python -m pip install &quot;markitdown[pdf]&quot;&#10;markitdown &quot;.\informe.pdf&quot; -o &quot;.\informe.md&quot;&#10;notepad &quot;.\informe.md&quot;">Copiar</button></div>
+            <pre>python -m pip install "markitdown[pdf]"
+# Coloca informe.pdf en C:\MarkItDownCurso
+markitdown ".\informe.pdf" -o ".\informe.md"
+notepad ".\informe.md"</pre>
+          </div>
+          <p><strong>Qué debes observar:</strong> Títulos, párrafos, listas, tablas y orden de lectura.</p>
+          <ul>
+            <li><strong>PDF con texto seleccionable:</strong> Es el caso más favorable; extrae el texto contenido.</li>
+            <li><strong>PDF escaneado:</strong> Puede contener fotografías de páginas en lugar de texto digital. MarkItDown no debe confundirse con una solución <strong>OCR</strong> (Optical Character Recognition) universal; puede necesitar una herramienta OCR especializada.</li>
+            <li><strong>Tablas, columnas e imágenes:</strong> Comprueba que filas y columnas mantengan sus relaciones; varias columnas pueden alterar el orden de lectura; no presupongas que todo el contenido visual será recuperado.</li>
+          </ul>
+          <p><strong>Reto y Solución:</strong> Convierte dos PDF diferentes (uno digital y otro escaneado) y compara. El digital ofrecerá mejores resultados; el escaneado necesitará OCR.</p>
+        </div>
+      </details>
+
+      <!-- CASO 3 -->
+      <details class="accordion">
+        <summary>Caso 3. Convertir Word (.DOCX)</summary>
+        <div class="accordion-body">
+          <p><strong>Objetivo:</strong> Convertir un documento DOCX (crea <code>empresa.docx</code> con Título "Mi empresa", Subtítulo "Servicios", párrafos, lista y tabla de 3 columnas).</p>
+          <div class="code-wrapper">
+            <div class="code-header"><span>PowerShell — Caso 3</span><button type="button" class="copy-btn" data-copy="python -m pip install &quot;markitdown[docx]&quot;&#10;markitdown &quot;.\empresa.docx&quot; -o &quot;.\empresa.md&quot;&#10;notepad &quot;.\empresa.md&quot;">Copiar</button></div>
+            <pre>python -m pip install "markitdown[docx]"
+markitdown ".\empresa.docx" -o ".\empresa.md"
+notepad ".\empresa.md"</pre>
+          </div>
+          <p><strong>Comprueba:</strong> Títulos, párrafos, listas y tablas. <strong>Limitaciones:</strong> La tipografía, colores y distribución de página no tienen por qué conservarse. <strong>Reto:</strong> Crea un Word con 2 títulos, 3 párrafos y 1 tabla y verifica el Markdown.</p>
+        </div>
+      </details>
+
+      <!-- CASO 4 -->
+      <details class="accordion">
+        <summary>Caso 4. Convertir PowerPoint (.PPTX)</summary>
+        <div class="accordion-body">
+          <p><strong>Objetivo:</strong> Extraer contenido de presentaciones (crea <code>presentacion.pptx</code> con 3 diapositivas: 1. Presentación, 2. Objetivos, 3. Conclusiones).</p>
+          <div class="code-wrapper">
+            <div class="code-header"><span>PowerShell — Caso 4</span><button type="button" class="copy-btn" data-copy="python -m pip install &quot;markitdown[pptx]&quot;&#10;markitdown &quot;.\presentacion.pptx&quot; -o &quot;.\presentacion.md&quot;&#10;notepad &quot;.\presentacion.md&quot;">Copiar</button></div>
+            <pre>python -m pip install "markitdown[pptx]"
+markitdown ".\presentacion.pptx" -o ".\presentacion.md"
+notepad ".\presentacion.md"</pre>
+          </div>
+          <p><strong>Extrae:</strong> Texto, títulos y contenido de diapositivas. <strong>Pierde:</strong> Animaciones, transiciones, posiciones exactas y distribución visual. Las notas del presentador no deben darse por garantizadas sin comprobar la versión. <strong>Reto:</strong> Crea una presentación sobre IA y conviértela.</p>
+        </div>
+      </details>
+
+      <!-- CASO 5 -->
+      <details class="accordion">
+        <summary>Caso 5. Convertir Excel (.XLSX)</summary>
+        <div class="accordion-body">
+          <p><strong>Objetivo:</strong> Extraer información de hojas de cálculo. Crea <code>ventas.xlsx</code> con la tabla: <code>PRODUCTO | UNIDADES | PRECIO</code> (Mesa 4 100, Silla 8 35, Armario 2 250).</p>
+          <div class="code-wrapper">
+            <div class="code-header"><span>PowerShell — Caso 5</span><button type="button" class="copy-btn" data-copy="python -m pip install &quot;markitdown[xlsx]&quot;&#10;markitdown &quot;.\ventas.xlsx&quot; -o &quot;.\ventas.md&quot;&#10;notepad &quot;.\ventas.md&quot;">Copiar</button></div>
+            <pre>python -m pip install "markitdown[xlsx]"
+markitdown ".\ventas.xlsx" -o ".\ventas.md"
+notepad ".\ventas.md"</pre>
+          </div>
+          <p><strong>Conceptos:</strong> Hoja (pestaña), Fila (horizontal), Columna (vertical), Fórmula (instrucción de cálculo). <strong>Limitaciones:</strong> Gráficos, formatos y fórmulas pueden no representarse igual; comprueba siempre los valores importantes. <strong>Reto:</strong> Añade una segunda hoja con otros productos y comprueba si ambas aparecen.</p>
+        </div>
+      </details>
+
+      <!-- CASO 6 -->
+      <details class="accordion">
+        <summary>Caso 6. Convertir CSV y JSON (.CSV / .JSON)</summary>
+        <div class="accordion-body">
+          <p><strong>Objetivo:</strong> Comprender dos formatos habituales de intercambio de datos (CSV para datos tabulares; JSON para propiedades, valores, listas y objetos).</p>
+          <div class="code-wrapper">
+            <div class="code-header"><span>PowerShell — Caso 6</span><button type="button" class="copy-btn" data-copy="@'&#10;nombre,edad,ciudad&#10;Ana,30,Valencia&#10;Carlos,42,Madrid&#10;Lucia,35,Sevilla&#10;'@ | Set-Content &quot;.\personas.csv&quot; -Encoding utf8&#10;markitdown &quot;.\personas.csv&quot; -o &quot;.\personas.md&quot;&#10;&#10;@'&#10;{&#10;  &quot;empresa&quot;: &quot;Ejemplo&quot;,&#10;  &quot;servicios&quot;: [&#10;    &quot;Limpieza&quot;,&#10;    &quot;Mantenimiento&quot;,&#10;    &quot;Desinfección&quot;&#10;  ],&#10;  &quot;ciudad&quot;: &quot;Valencia&quot;&#10;}&#10;'@ | Set-Content &quot;.\empresa.json&quot; -Encoding utf8&#10;markitdown &quot;.\empresa.json&quot; -o &quot;.\empresa_json.md&quot;">Copiar</button></div>
+            <pre>@'
+nombre,edad,ciudad
+Ana,30,Valencia
+Carlos,42,Madrid
+Lucia,35,Sevilla
+'@ | Set-Content ".\personas.csv" -Encoding utf8
+markitdown ".\personas.csv" -o ".\personas.md"
+
+@'
+{
+  "empresa": "Ejemplo",
+  "servicios": [
+    "Limpieza",
+    "Mantenimiento",
+    "Desinfección"
+  ],
+  "ciudad": "Valencia"
+}
+'@ | Set-Content ".\empresa.json" -Encoding utf8
+markitdown ".\empresa.json" -o ".\empresa_json.md"</pre>
+          </div>
+          <p><strong>Reto y Solución:</strong> Crea un JSON con tres productos siguiendo la misma estructura y conviértelo.</p>
+        </div>
+      </details>
+
+      <!-- CASO 7 -->
+      <details class="accordion">
+        <summary>Caso 7. Convertir HTML (.HTML)</summary>
+        <div class="accordion-body">
+          <p><strong>Objetivo:</strong> Convertir una página HTML guardada localmente.</p>
+          <div class="code-wrapper">
+            <div class="code-header"><span>PowerShell — Caso 7</span><button type="button" class="copy-btn" data-copy="@'&#10;&lt;!DOCTYPE html&gt;&#10;&lt;html lang=&quot;es&quot;&gt;&#10;&lt;head&gt;&#10;&lt;meta charset=&quot;UTF-8&quot;&gt;&#10;&lt;title&gt;Mi página&lt;/title&gt;&#10;&lt;/head&gt;&#10;&lt;body&gt;&#10;&lt;h1&gt;Mi proyecto&lt;/h1&gt;&#10;&lt;p&gt;Este es un ejemplo de página HTML.&lt;/p&gt;&#10;&lt;h2&gt;Servicios&lt;/h2&gt;&#10;&lt;ul&gt;&#10;&lt;li&gt;Investigación&lt;/li&gt;&#10;&lt;li&gt;Automatización&lt;/li&gt;&#10;&lt;li&gt;Inteligencia artificial&lt;/li&gt;&#10;&lt;/ul&gt;&#10;&lt;a href=&quot;https://www.microsoft.com&quot;&gt;Microsoft&lt;/a&gt;&#10;&lt;/body&gt;&#10;&lt;/html&gt;&#10;'@ | Set-Content &quot;.\pagina.html&quot; -Encoding utf8&#10;markitdown &quot;.\pagina.html&quot; -o &quot;.\pagina.md&quot;&#10;notepad &quot;.\pagina.md&quot;">Copiar</button></div>
+            <pre>@'
+&lt;!DOCTYPE html&gt;
+&lt;html lang="es"&gt;
+&lt;head&gt;
+&lt;meta charset="UTF-8"&gt;
+&lt;title&gt;Mi página&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;h1&gt;Mi proyecto&lt;/h1&gt;
+&lt;p&gt;Este es un ejemplo de página HTML.&lt;/p&gt;
+&lt;h2&gt;Servicios&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;Investigación&lt;/li&gt;
+&lt;li&gt;Automatización&lt;/li&gt;
+&lt;li&gt;Inteligencia artificial&lt;/li&gt;
+&lt;/ul&gt;
+&lt;a href="https://www.microsoft.com"&gt;Microsoft&lt;/a&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+'@ | Set-Content ".\pagina.html" -Encoding utf8
+
+markitdown ".\pagina.html" -o ".\pagina.md"
+notepad ".\pagina.md"</pre>
+          </div>
+          <p><strong>Qué sucede:</strong> Texto y enlaces se extraen; menús o anuncios pueden aparecer si están en el HTML; JavaScript no se ejecuta automáticamente (webs dinámicas requieren navegador automatizado). <strong>Reto:</strong> Añade una tabla HTML y vuelve a convertir.</p>
+        </div>
+      </details>
+
+      <!-- CASO 8 -->
+      <details class="accordion">
+        <summary>Caso 8. Imágenes y OCR (.JPG / .PNG)</summary>
+        <div class="accordion-body">
+          <p><strong>Objetivo:</strong> Distinguir entre <strong>Metadatos EXIF</strong> (fecha, cámara, resolución, orientación), <strong>OCR</strong> (reconocimiento de caracteres) y <strong>Descripción mediante IA</strong> (requiere servicios externos). No confundas MarkItDown con OCR completo.</p>
+          <div class="code-wrapper">
+            <div class="code-header"><span>PowerShell — Caso 8</span><button type="button" class="copy-btn" data-copy="markitdown &quot;.\foto.jpg&quot; -o &quot;.\foto.md&quot;&#10;notepad &quot;.\foto.md&quot;">Copiar</button></div>
+            <pre>markitdown ".\foto.jpg" -o ".\foto.md"
+notepad ".\foto.md"</pre>
+          </div>
+          <p><strong>Reto y Solución:</strong> Fotografía un documento con texto y compara metadatos con texto visible. Si el texto no aparece, no es un fallo: falta OCR.</p>
+        </div>
+      </details>
+
+      <!-- CASO 9 -->
+      <details class="accordion">
+        <summary>Caso 9. Audio y YouTube (.WAV / .MP3 / URL)</summary>
+        <div class="accordion-body">
+          <p><strong>Objetivo:</strong> Conocer las posibilidades de procesamiento de audio y transcripciones de YouTube (requiere conexión a Internet y subtítulos disponibles; no descarga vídeos).</p>
+          <div class="code-wrapper">
+            <div class="code-header"><span>PowerShell — Caso 9</span><button type="button" class="copy-btn" data-copy="python -m pip install &quot;markitdown[audio-transcription]&quot;&#10;markitdown &quot;.\grabacion.wav&quot; -o &quot;.\grabacion.md&quot;&#10;python -m pip install &quot;markitdown[youtube-transcription]&quot;">Copiar</button></div>
+            <pre># Audio:
+python -m pip install "markitdown[audio-transcription]"
+markitdown ".\grabacion.wav" -o ".\grabacion.md"
+
+# YouTube:
+python -m pip install "markitdown[youtube-transcription]"</pre>
+          </div>
+          <p><strong>Reto y Solución:</strong> Prueba un vídeo público con subtítulos disponibles. Si falla, verifica si el vídeo tiene subtítulos o restricciones antes de atribuir el error a MarkItDown.</p>
+        </div>
+      </details>
+
+      <!-- CASO 10 -->
+      <details class="accordion">
+        <summary>Caso 10. Crear una Biblioteca Preparada para IA y RAG</summary>
+        <div class="accordion-body">
+          <p><strong>Objetivo:</strong> Construir una biblioteca documental estructurada y analizarla con IA.</p>
+          <div class="code-wrapper">
+            <div class="code-header"><span>PowerShell — Estructura de Biblioteca</span><button type="button" class="copy-btn" data-copy="New-Item -ItemType Directory -Path &quot;.\originales&quot; -Force&#10;New-Item -ItemType Directory -Path &quot;.\markdown&quot; -Force&#10;New-Item -ItemType Directory -Path &quot;.\informes&quot; -Force&#10;New-Item -ItemType Directory -Path &quot;.\scripts&quot; -Force&#10;&#10;Get-ChildItem &quot;.\originales&quot; -Filter &quot;*.pdf&quot; -File | ForEach-Object {&#10;    $destino = Join-Path &quot;.\markdown&quot; ($_.BaseName + &quot;.md&quot;)&#10;    if (-not (Test-Path $destino)) {&#10;        markitdown $_.FullName -o $destino&#10;    }&#10;}">Copiar</button></div>
+            <pre>New-Item -ItemType Directory -Path ".\originales" -Force
+New-Item -ItemType Directory -Path ".\markdown" -Force
+New-Item -ItemType Directory -Path ".\informes" -Force
+New-Item -ItemType Directory -Path ".\scripts" -Force
+
+Get-ChildItem ".\originales" -Filter "*.pdf" -File | ForEach-Object {
+    $destino = Join-Path ".\markdown" ($_.BaseName + ".md")
+    if (-not (Test-Path $destino)) {
+        markitdown $_.FullName -o $destino
+    }
+}</pre>
+          </div>
+          <p><strong>Flujo de trabajo completo:</strong> 1. Copiar documentos a <code>originales</code> → 2. Convertir → 3. Revisar → 4. Identificar errores (vacíos, tablas incompletas, desorden, OCR) → 5. Organizar con nombres claros (<code>contrato_2026.md</code>, <code>manual_equipo.md</code>, <code>presupuesto_enero.md</code>, <code>investigacion_ia.md</code>) → 6. Consultar a una IA → 7. Contrastar siempre con el original.</p>
+          <div class="info-box">
+            <strong>¿Qué es RAG (Retrieval-Augmented Generation)?</strong><br>
+            1. Recibir documentos → 2. Extraer contenido → 3. Dividir en fragmentos → 4. Crear representaciones vectoriales → 5. Guardar en base de datos → 6. Recuperar fragmentos relevantes → 7. Entregar a LLM → 8. Generar respuesta.<br>
+            <strong>MARKITDOWN NO ES UN SISTEMA RAG:</strong> Participa únicamente en la etapa de preparación documental.
+          </div>
+        </div>
+      </details>
+    </div>
+
+    <div class="tab-footer-nav">
+      <button type="button" class="btn-secondary prev-tab-btn" data-prev="4">← Anterior: Primera Conversión y CLI</button>
+      <button type="button" class="btn-primary next-tab-btn" data-next="6">Siguiente: 10 Proyectos →</button>
+    </div>
+  </section>
+
+  <!-- PESTAÑA 6: 10 PROYECTOS -->
+  <section class="tab-panel" data-t="10 Proyectos" id="tab-6">
+    <div class="card">
+      <h2 class="section-heading">10 Proyectos Aplicados con MarkItDown</h2>
+      <p>Estos 10 proyectos integradores consolidan todo lo aprendido en el curso aplicando exactamente los comandos CLI, scripts de PowerShell, la API de Python y los flujos de preparación para IA documentados en el tutorial.</p>
+
+      <details class="accordion" open>
+        <summary>Proyecto 1. Conversor Universal de Carpeta "Bandeja de Entrada"</summary>
+        <div class="accordion-body">
+          <p><strong>Propósito:</strong> Automatizar el vaciado de una carpeta <code>originales</code> hacia <code>markdown</code> sin sobrescribir archivos existentes.</p>
+          <div class="code-wrapper">
+            <div class="code-header"><span>PowerShell — Proyecto 1</span><button type="button" class="copy-btn" data-copy="Get-ChildItem &quot;.\originales&quot; -File | ForEach-Object {&#10;    $destino = Join-Path &quot;.\markdown&quot; ($_.BaseName + &quot;.md&quot;)&#10;    if (-not (Test-Path $destino)) {&#10;        markitdown $_.FullName -o $destino&#10;    }&#10;}">Copiar</button></div>
+            <pre>Get-ChildItem ".\originales" -File | ForEach-Object {
+    $destino = Join-Path ".\markdown" ($_.BaseName + ".md")
+    if (-not (Test-Path $destino)) {
+        markitdown $_.FullName -o $destino
+    }
+}</pre>
+          </div>
+        </div>
+      </details>
+
+      <details class="accordion">
+        <summary>Proyecto 2. Archivo Histórico de Contratos y Presupuestos 2026</summary>
+        <div class="accordion-body">
+          <p><strong>Propósito:</strong> Crear una biblioteca documental corporativa normalizada (<code>contrato_2026.md</code>, <code>presupuesto_enero.md</code>) a partir de documentos PDF y Word para auditar cláusulas e importes mediante IA.</p>
+        </div>
+      </details>
+
+      <details class="accordion">
+        <summary>Proyecto 3. Extractor de Tablas Financieras desde Excel (.XLSX)</summary>
+        <div class="accordion-body">
+          <p><strong>Propósito:</strong> Convertir libros de ventas (<code>ventas.xlsx</code>) en tablas Markdown auditables para detectar desviaciones de precios y unidades, contrastando siempre fórmulas con el libro original.</p>
+        </div>
+      </details>
+
+      <details class="accordion">
+        <summary>Proyecto 4. Sintetizador de Presentaciones Ejecutivas (.PPTX)</summary>
+        <div class="accordion-body">
+          <p><strong>Propósito:</strong> Extraer la estructura narrativa de diapositivas (<code>presentacion.pptx</code>) hacia texto plano limpio para generar resúmenes ejecutivos con LLM.</p>
+        </div>
+      </details>
+
+      <details class="accordion">
+        <summary>Proyecto 5. Normalizador de Datos Híbridos CSV y JSON</summary>
+        <div class="accordion-body">
+          <p><strong>Propósito:</strong> Unificar registros tabulares (<code>personas.csv</code>) y catálogos estructurados (<code>empresa.json</code>) en documentos Markdown homogéneos listos para análisis cruzado.</p>
+        </div>
+      </details>
+
+      <details class="accordion">
+        <summary>Proyecto 6. Extractor de Documentación Web Local (.HTML)</summary>
+        <div class="accordion-body">
+          <p><strong>Propósito:</strong> Limpiar etiquetas de páginas web guardadas localmente (<code>pagina.html</code>) conservando encabezados, listas y enlaces relevantes.</p>
+        </div>
+      </details>
+
+      <details class="accordion">
+        <summary>Proyecto 7. Catalogador de Metadatos EXIF de Evidencias Fotográficas</summary>
+        <div class="accordion-body">
+          <p><strong>Propósito:</strong> Extraer información técnica (cámara, fecha, resolución, orientación) de fotografías (<code>foto.jpg</code>) separando claramente metadatos de reconocimiento OCR.</p>
+        </div>
+      </details>
+
+      <details class="accordion">
+        <summary>Proyecto 8. Archivo de Transcripciones de Reuniones y Vídeos Educativos</summary>
+        <div class="accordion-body">
+          <p><strong>Propósito:</strong> Utilizar <code>markitdown[audio-transcription]</code> y <code>markitdown[youtube-transcription]</code> para indexar actas habladas y vídeos con subtítulos públicos.</p>
+        </div>
+      </details>
+
+      <details class="accordion">
+        <summary>Proyecto 9. Microservicio Local de Conversión con la API Python</summary>
+        <div class="accordion-body">
+          <p><strong>Propósito:</strong> Integrar la clase <code>MarkItDown()</code> en <code>convertir.py</code> con validación de existencia previa mediante <code>pathlib.Path</code> y codificación UTF-8.</p>
+        </div>
+      </details>
+
+      <details class="accordion">
+        <summary>Proyecto 10. Pipeline Pre-RAG Auditado con Trazabilidad de Fuentes</summary>
+        <div class="accordion-body">
+          <p><strong>Propósito:</strong> Implementar la arquitectura completa: <code>DOCUMENTOS → MARKITDOWN → VALIDACIÓN → LIMPIEZA → FRAGMENTACIÓN → BASE VECTORIAL → RECUPERACIÓN → LLM → RESPUESTA CON REFERENCIAS</code>.</p>
+        </div>
+      </details>
+    </div>
+
+    <div class="tab-footer-nav">
+      <button type="button" class="btn-secondary prev-tab-btn" data-prev="5">← Anterior: 10 Casos Prácticos</button>
+      <button type="button" class="btn-primary next-tab-btn" data-next="7">Siguiente: Automatización y Python →</button>
+    </div>
+  </section>
+
+  <!-- PESTAÑA 7: AUTOMATIZACIÓN Y PYTHON -->
+  <section class="tab-panel" data-t="Automatización y Python" id="tab-7">
+    <div class="card">
+      <h2 class="section-heading">7. Automatización y Uso Profesional</h2>
+
+      <h3>7.1. Procesamiento repetitivo en PowerShell</h3>
+      <p>Cuando tienes muchos documentos, convertirlos uno a uno deja de ser práctico. Este script intenta convertir todos los archivos compatibles de <code>.\originales</code> hacia <code>.\markdown</code>:</p>
+      <div class="code-wrapper">
+        <div class="code-header"><span>PowerShell — Procesamiento por lotes</span><button type="button" class="copy-btn" data-copy="Get-ChildItem &quot;.\originales&quot; -File | ForEach-Object {&#10;    $destino = Join-Path &quot;.\markdown&quot; ($_.BaseName + &quot;.md&quot;)&#10;&#10;    if (-not (Test-Path $destino)) {&#10;        markitdown $_.FullName -o $destino&#10;    }&#10;}">Copiar</button></div>
+        <pre>Get-ChildItem ".\originales" -File | ForEach-Object {
+    $destino = Join-Path ".\markdown" ($_.BaseName + ".md")
+
+    if (-not (Test-Path $destino)) {
+        markitdown $_.FullName -o $destino
+    }
+}</pre>
+      </div>
+
+      <h3>7.2. Diferencia entre CLI y API</h3>
+      <ul>
+        <li><strong>CLI (Command Line Interface):</strong> Se utiliza escribiendo comandos directos en PowerShell; ideal para conversiones directas.</li>
+        <li><strong>API (Application Programming Interface):</strong> Permite que otro programa Python utilice las funciones de MarkItDown dentro de aplicaciones propias.</li>
+      </ul>
+
+      <h3>7.3. Primer programa Python (convertir.py)</h3>
+      <p><strong>Objetivo:</strong> Crear un programa en <code>C:\MarkItDownCurso\convertir.py</code> que convierta un documento y guarde el resultado con el entorno virtual activado:</p>
+      <div class="code-wrapper">
+        <div class="code-header"><span>Python — C:\MarkItDownCurso\convertir.py</span><button type="button" class="copy-btn" data-copy="from pathlib import Path&#10;from markitdown import MarkItDown&#10;&#10;carpeta = Path(__file__).parent&#10;&#10;archivo_entrada = carpeta / &quot;proyecto.txt&quot;&#10;archivo_salida = carpeta / &quot;proyecto_python.md&quot;&#10;&#10;if not archivo_entrada.exists():&#10;    print(&quot;ERROR: No se encuentra el documento original.&quot;)&#10;    raise SystemExit(1)&#10;&#10;convertidor = MarkItDown()&#10;&#10;resultado = convertidor.convert(str(archivo_entrada))&#10;&#10;contenido = resultado.markdown&#10;&#10;archivo_salida.write_text(contenido, encoding=&quot;utf-8&quot;)&#10;&#10;print(&quot;Conversión terminada.&quot;)&#10;print(f&quot;Archivo creado: {archivo_salida}&quot;)">Copiar código Python</button></div>
+        <pre>from pathlib import Path
+from markitdown import MarkItDown
+
+carpeta = Path(__file__).parent
+
+archivo_entrada = carpeta / "proyecto.txt"
+archivo_salida = carpeta / "proyecto_python.md"
+
+if not archivo_entrada.exists():
+    print("ERROR: No se encuentra el documento original.")
+    raise SystemExit(1)
+
+convertidor = MarkItDown()
+
+resultado = convertidor.convert(str(archivo_entrada))
+
+contenido = resultado.markdown
+
+archivo_salida.write_text(contenido, encoding="utf-8")
+
+print("Conversión terminada.")
+print(f"Archivo creado: {archivo_salida}")</pre>
+      </div>
+      <div class="code-wrapper">
+        <div class="code-header"><span>PowerShell — Ejecutar y abrir resultado</span><button type="button" class="copy-btn" data-copy="python &quot;.\convertir.py&quot;&#10;notepad &quot;.\proyecto_python.md&quot;">Copiar</button></div>
+        <pre>python ".\convertir.py"
+notepad ".\proyecto_python.md"</pre>
+      </div>
+      <ul>
+        <li><code>from pathlib import Path</code>: Importa herramientas para trabajar con rutas.</li>
+        <li><code>from markitdown import MarkItDown</code>: Importa la clase principal.</li>
+        <li><code>carpeta = Path(__file__).parent</code>: Identifica la carpeta donde está el programa.</li>
+        <li><code>MarkItDown()</code> y <code>convert()</code>: Crea el convertidor y realiza la conversión.</li>
+        <li><code>resultado.markdown</code> y <code>write_text()</code>: Contiene el texto Markdown generado y lo guarda en UTF-8.</li>
+      </ul>
+
+      <h3>7.4. Integraciones y 7.5. Plugins</h3>
+      <p>MarkItDown puede integrarse en aplicaciones Python, procesadores documentales, sistemas de automatización, flujos de IA, búsqueda y preparación para RAG. Además admite <strong>plugins de terceros</strong> (desactivados por defecto):</p>
+      <div class="code-wrapper">
+        <div class="code-header"><span>PowerShell — Gestión de plugins</span><button type="button" class="copy-btn" data-copy="markitdown --list-plugins&#10;markitdown --use-plugins &quot;.\documento.pdf&quot;">Copiar</button></div>
+        <pre>markitdown --list-plugins
+markitdown --use-plugins ".\documento.pdf"</pre>
+      </div>
+      <p><em>No instales plugins desconocidos sin revisar su código y procedencia.</em></p>
+
+      <h3>7.6. Seguridad y Privacidad (10 Buenas Prácticas)</h3>
+      <p>MarkItDown realiza operaciones de entrada y salida utilizando los permisos del proceso que lo ejecuta. Un programa que procesa documentos desconocidos puede acceder a recursos disponibles para el usuario:</p>
+      <ol>
+        <li>Procesa documentos de procedencia conocida.</li>
+        <li>Utiliza carpetas de trabajo controladas.</li>
+        <li>No ejecutes archivos desconocidos.</li>
+        <li>Mantén copias de los originales.</li>
+        <li>No compartas documentos confidenciales sin autorización.</li>
+        <li>Protege las claves API (nunca las publiques en GitHub ni en documentos compartidos).</li>
+        <li>Comprueba los servicios externos utilizados (la extracción básica es local, pero la descripción de imágenes o transcripciones pueden usar servicios en la nube).</li>
+        <li>Revisa los plugins.</li>
+        <li>Mantén actualizadas las dependencias.</li>
+        <li>Limita los permisos cuando trabajes con documentos de terceros.</li>
+      </ol>
+    </div>
+
+    <div class="tab-footer-nav">
+      <button type="button" class="btn-secondary prev-tab-btn" data-prev="6">← Anterior: 10 Proyectos</button>
+      <button type="button" class="btn-primary next-tab-btn" data-next="8">Siguiente: PROMPTS →</button>
+    </div>
+  </section>
+
+  <!-- PESTAÑA 8: PROMPTS -->
+  <section class="tab-panel" data-t="PROMPTS" id="tab-8">
+    <div class="card">
+      <h2 class="section-heading">Prompts Reutilizables del Tutorial</h2>
+      <p>Recopilación íntegra de todos los prompts incluidos en el tutorial junto con su contexto exacto de empleo para analizar tus archivos Markdown convertidos con una Inteligencia Artificial (ChatGPT, Claude, Gemini o modelos locales con Ollama).</p>
+
+      <div class="card" style="background:var(--bg-elevated);">
+        <h3>Prompt 1. Análisis estructural y extracción verificable de datos</h3>
+        <p><strong>Dónde se emplea:</strong> Sección 6 — Caso de Uso 10 (Paso 6: <em>Utilizar una IA</em> tras convertir documentos de tu biblioteca documental <code>.\markdown\</code>).</p>
+        <div class="code-wrapper">
+          <div class="code-header"><span>Prompt 1 — Copiar texto exacto</span><button type="button" class="copy-btn" data-copy="Analiza este documento. Identifica sus apartados, extrae los datos principales y señala cualquier información que no puedas verificar.">Copiar Prompt</button></div>
+          <pre>Analiza este documento. Identifica sus apartados, extrae los datos principales y señala cualquier información que no puedas verificar.</pre>
+        </div>
+      </div>
+
+      <div class="card" style="background:var(--bg-elevated);">
+        <h3>Prompt 2. Trazabilidad y ubicación exacta de cada dato</h3>
+        <p><strong>Dónde se emplea:</strong> Sección 6 — Caso de Uso 10 (Paso 6: <em>Utilizar una IA</em> — consulta de seguimiento para auditar y contrastar los resultados con el documento original).</p>
+        <div class="code-wrapper">
+          <div class="code-header"><span>Prompt 2 — Copiar texto exacto</span><button type="button" class="copy-btn" data-copy="Indica en qué parte del documento aparece cada dato importante.">Copiar Prompt</button></div>
+          <pre>Indica en qué parte del documento aparece cada dato importante.</pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-footer-nav">
+      <button type="button" class="btn-secondary prev-tab-btn" data-prev="7">← Anterior: Automatización y Python</button>
+      <button type="button" class="btn-primary next-tab-btn" data-next="9">Siguiente: 33 Preguntas (Q&amp;A) →</button>
+    </div>
+  </section>
+
+  <!-- PESTAÑA 9: 33 PREGUNTAS (Q&A) — ANTES QUE ERRORES -->
+  <section class="tab-panel" data-t="33 Preguntas (Q&amp;A)" id="tab-9">
+    <div class="card">
+      <h2 class="section-heading">9. 33 Preguntas y Respuestas (Q&amp;A)</h2>
+      <p>Ordenadas progresivamente por nivel de dificultad: Nivel 1 (Principiante), Nivel 2 (Intermedio) y Nivel 3 (Avanzado / Profesional).</p>
+
+      <div class="qa-controls">
+        <button type="button" class="btn-primary" id="expand-all-qa">+ Desplegar todas respuestas</button>
+        <button type="button" class="btn-secondary" id="collapse-all-qa">- Plegar todas las respuestas</button>
+      </div>
+
+      <div id="qa-container">
+        <h3>NIVEL 1 — PRINCIPIANTE (Preguntas 1 a 11)</h3>
+        <details class="accordion qa-item"><summary>1. ¿Qué es MarkItDown?</summary><div class="accordion-body">Es una herramienta de Microsoft que convierte diferentes formatos de documentos a Markdown para facilitar el análisis y procesamiento textual.</div></details>
+        <details class="accordion qa-item"><summary>2. ¿Para qué sirve?</summary><div class="accordion-body">Para extraer contenido de documentos y prepararlo para sistemas de análisis, búsqueda e inteligencia artificial.</div></details>
+        <details class="accordion qa-item"><summary>3. ¿Qué es Markdown?</summary><div class="accordion-body">Es un formato de texto estructurado que utiliza símbolos sencillos para representar títulos, listas, enlaces y tablas.</div></details>
+        <details class="accordion qa-item"><summary>4. ¿Por qué es útil para IA?</summary><div class="accordion-body">Porque proporciona contenido textual organizado y relativamente eficiente para los modelos de lenguaje.</div></details>
+        <details class="accordion qa-item"><summary>5. ¿Necesito saber programar?</summary><div class="accordion-body">No. Puedes utilizar MarkItDown mediante comandos de PowerShell.</div></details>
+        <details class="accordion qa-item"><summary>6. ¿Qué es Python?</summary><div class="accordion-body">Un lenguaje de programación que permite ejecutar MarkItDown y desarrollar automatizaciones.</div></details>
+        <details class="accordion qa-item"><summary>7. ¿Qué es PowerShell?</summary><div class="accordion-body">Una herramienta de Windows para ejecutar comandos.</div></details>
+        <details class="accordion qa-item"><summary>8. ¿Qué formatos puede convertir?</summary><div class="accordion-body">Entre otros, PDF, DOCX, PPTX, XLSX, CSV, JSON, XML, HTML, imágenes, audio y EPUB, con las condiciones correspondientes.</div></details>
+        <details class="accordion qa-item"><summary>9. ¿Dónde se guarda el resultado?</summary><div class="accordion-body">En el archivo Markdown que especifiques mediante <code>-o</code> o mediante una redirección.</div></details>
+        <details class="accordion qa-item"><summary>10. ¿MarkItDown conserva el diseño original?</summary><div class="accordion-body">No necesariamente. Su prioridad es extraer contenido y estructura.</div></details>
+        <details class="accordion qa-item"><summary>11. ¿Qué hago si no funciona?</summary><div class="accordion-body">Comprueba Python, el entorno virtual, la instalación, las dependencias y la ruta del archivo.</div></details>
+
+        <h3>NIVEL 2 — INTERMEDIO (Preguntas 12 a 22)</h3>
+        <details class="accordion qa-item"><summary>12. ¿Qué son las dependencias?</summary><div class="accordion-body">Son componentes adicionales necesarios para determinadas funciones.</div></details>
+        <details class="accordion qa-item"><summary>13. ¿Puede leer PDF escaneados?</summary><div class="accordion-body">No debes darlo por garantizado. Un PDF escaneado puede necesitar OCR.</div></details>
+        <details class="accordion qa-item"><summary>14. ¿Puede convertir Excel?</summary><div class="accordion-body">Sí. Puede extraer información de hojas de cálculo, pero debes comprobar fórmulas, tablas y gráficos.</div></details>
+        <details class="accordion qa-item"><summary>15. ¿Puede convertir Word?</summary><div class="accordion-body">Sí, mediante la dependencia correspondiente para DOCX.</div></details>
+        <details class="accordion qa-item"><summary>16. ¿Puede convertir PowerPoint?</summary><div class="accordion-body">Sí, puede extraer contenido textual de presentaciones.</div></details>
+        <details class="accordion qa-item"><summary>17. ¿Puede describir imágenes?</summary><div class="accordion-body">Puede utilizar servicios de IA para describir imágenes cuando se configura la integración correspondiente.</div></details>
+        <details class="accordion qa-item"><summary>18. ¿Qué es OCR?</summary><div class="accordion-body">Es el reconocimiento óptico de caracteres: permite extraer texto de imágenes.</div></details>
+        <details class="accordion qa-item"><summary>19. ¿Puede transcribir audio?</summary><div class="accordion-body">Puede hacerlo mediante las dependencias y configuraciones correspondientes.</div></details>
+        <details class="accordion qa-item"><summary>20. ¿Qué son los plugins?</summary><div class="accordion-body">Componentes adicionales que amplían las funciones de MarkItDown.</div></details>
+        <details class="accordion qa-item"><summary>21. ¿Puede convertir cien documentos?</summary><div class="accordion-body">Sí, mediante automatización y procesamiento por lotes, siempre que los formatos estén soportados.</div></details>
+        <details class="accordion qa-item"><summary>22. ¿Cómo compruebo la calidad?</summary><div class="accordion-body">Comparando el resultado Markdown con el documento original.</div></details>
+
+        <h3>NIVEL 3 — AVANZADO / PROFESIONAL (Preguntas 23 a 33)</h3>
+        <details class="accordion qa-item"><summary>23. ¿Qué es la API Python?</summary><div class="accordion-body">Es la interfaz que permite utilizar MarkItDown desde programas Python.</div></details>
+        <details class="accordion qa-item"><summary>24. ¿Puedo automatizar conversiones?</summary><div class="accordion-body">Sí. Puedes utilizar PowerShell, Python y otros sistemas de automatización.</div></details>
+        <details class="accordion qa-item"><summary>25. ¿Es seguro procesar documentos desconocidos?</summary><div class="accordion-body">No debes asumirlo. Hay que controlar permisos, entradas y procedencia de los archivos.</div></details>
+        <details class="accordion qa-item"><summary>26. ¿MarkItDown envía documentos a Internet?</summary><div class="accordion-body">Las conversiones básicas no implican necesariamente servicios externos. Algunas funciones opcionales sí pueden depender de servicios en la nube.</div></details>
+        <details class="accordion qa-item"><summary>27. ¿Qué rendimiento tiene?</summary><div class="accordion-body">Depende del tamaño, formato, complejidad y dependencias. Conviene realizar pruebas representativas.</div></details>
+        <details class="accordion qa-item"><summary>28. ¿MarkItDown crea un RAG?</summary><div class="accordion-body">No. Prepara contenido que puede utilizarse dentro de un sistema RAG.</div></details>
+        <details class="accordion qa-item"><summary>29. ¿Puede trabajar con ChatGPT?</summary><div class="accordion-body">Sí, sus resultados pueden utilizarse con herramientas de IA que admitan documentos o texto.</div></details>
+        <details class="accordion qa-item"><summary>30. ¿Puede integrarse con otros sistemas?</summary><div class="accordion-body">Sí, mediante su API, automatizaciones y herramientas complementarias.</div></details>
+        <details class="accordion qa-item"><summary>31. ¿Cómo sería una arquitectura documental profesional?</summary><div class="accordion-body">
+          <pre>DOCUMENTOS
+    |
+    v
+MARKITDOWN
+    |
+    v
+VALIDACIÓN
+    |
+    v
+LIMPIEZA
+    |
+    v
+FRAGMENTACIÓN
+    |
+    v
+BASE VECTORIAL
+    |
+    v
+RECUPERACIÓN
+    |
+    v
+LLM
+    |
+    v
+RESPUESTA CON REFERENCIAS</pre>
+        </div></details>
+        <details class="accordion qa-item"><summary>32. ¿MarkItDown garantiza que la IA no se equivoque?</summary><div class="accordion-body">No. La calidad de la conversión y la recuperación influye en el resultado, pero no garantiza respuestas correctas.</div></details>
+        <details class="accordion qa-item"><summary>33. ¿Cuándo debo utilizar otra herramienta?</summary><div class="accordion-body">Cuando necesites OCR especializado, reconstrucción visual, extracción avanzada de tablas, comprensión de documentos complejos o funcionalidades que MarkItDown no ofrezca adecuadamente.</div></details>
+      </div>
+    </div>
+
+    <div class="tab-footer-nav">
+      <button type="button" class="btn-secondary prev-tab-btn" data-prev="8">← Anterior: PROMPTS</button>
+      <button type="button" class="btn-primary next-tab-btn" data-next="10">Siguiente: ERRORES →</button>
+    </div>
+  </section>
+
+  <!-- PESTAÑA 10: ERRORES -->
+  <section class="tab-panel" data-t="ERRORES" id="tab-10">
+    <div class="card">
+      <h2 class="section-heading">8. Errores y Soluciones (Tabla de Diagnóstico — 24 Casos)</h2>
+      <p>Consulta rápidamente el síntoma, la causa, la comprobación y la solución verificada ante cualquier incidencia.</p>
+
+      <div class="table-responsive">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Error / Síntoma</th>
+              <th>Causa y Comprobación</th>
+              <th>Solución y Verificación</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>1</strong></td><td><strong>PYTHON NO SE RECONOCE</strong><br><code>python</code> no se reconoce.</td><td>Instalación incorrecta o PATH.<br>Comprobar: <code>py --version</code></td><td>Revisar la instalación y los alias de ejecución.<br>Verificación: <code>python --version</code></td></tr>
+            <tr><td><strong>2</strong></td><td><strong>PY NO SE RECONOCE</strong><br>El lanzador no aparece.</td><td>No está instalado o no está disponible.</td><td>Revisar la instalación oficial de Python.<br>Verificación: <code>py --version</code></td></tr>
+            <tr><td><strong>3</strong></td><td><strong>PIP NO SE RECONOCE</strong><br><code>pip</code> no se reconoce.</td><td>Comando aislado no disponible en PATH.</td><td><code>py -m pip --version</code> — Utiliza <code>python -m pip</code> en lugar de depender del comando <code>pip</code> aislado.</td></tr>
+            <tr><td><strong>4</strong></td><td><strong>MARKITDOWN NO SE RECONOCE</strong><br>No se encuentra el comando.</td><td>Entorno inactivo o instalación incorrecta.<br>Comprobar: <code>python -m pip show markitdown</code></td><td>Activar <code>.venv</code> e instalar: <code>python -m pip install markitdown</code></td></tr>
+            <tr><td><strong>5</strong></td><td><strong>ERROR DE ACTIVACIÓN</strong><br>PowerShell bloquea <code>Activate.ps1</code>.</td><td>Política de ejecución.<br>Comprobar: <code>Get-ExecutionPolicy -List</code></td><td><code>Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass</code> y luego <code>.\.venv\Scripts\Activate.ps1</code></td></tr>
+            <tr><td><strong>6</strong></td><td><strong>PERMISOS INSUFICIENTES</strong><br>Acceso denegado.</td><td>Permisos de carpeta o archivo.</td><td>Trabajar en una carpeta donde tengas permisos (ej. <code>C:\MarkItDownCurso</code>).</td></tr>
+            <tr><td><strong>7</strong></td><td><strong>DEPENDENCIA AUSENTE</strong><br>Error de importación o módulo no encontrado.</td><td>Falta un extra opcional.</td><td><code>python -m pip install "markitdown[pdf]"</code> (cambia <code>pdf</code> por el extra correspondiente).</td></tr>
+            <tr><td><strong>8</strong></td><td><strong>FORMATO NO ADMITIDO</strong><br>No se reconoce el archivo.</td><td>Extensión o formato incompatible.</td><td>Comprobar la extensión, el formato real y la documentación.</td></tr>
+            <tr><td><strong>9</strong></td><td><strong>ARCHIVO NO ENCONTRADO</strong><br>No existe la ruta.</td><td>Carpeta equivocada.<br>Comprobar: <code>Get-Location</code> y <code>Get-ChildItem</code></td><td>Utilizar la ruta correcta.</td></tr>
+            <tr><td><strong>10</strong></td><td><strong>RUTAS CON ESPACIOS</strong><br>La ruta se interpreta incorrectamente.</td><td>Falta de comillas alrededor de la ruta.</td><td>Utilizar comillas: <code>markitdown "C:\Mis documentos\informe.pdf" -o "C:\Mis documentos\informe.md"</code></td></tr>
+            <tr><td><strong>11</strong></td><td><strong>ARCHIVO DAÑADO</strong><br>Error de lectura.</td><td>Archivo original corrupto.</td><td>Abrir el original con su aplicación correspondiente y comprobar su integridad.</td></tr>
+            <tr><td><strong>12</strong></td><td><strong>PDF ESCANEADO</strong><br>Resultado vacío o incompleto.</td><td>El PDF contiene imágenes sin capa de texto.</td><td>Aplicar OCR mediante una herramienta adecuada.</td></tr>
+            <tr><td><strong>13</strong></td><td><strong>CONVERSIÓN INCOMPLETA</strong><br>Faltan apartados.</td><td>Elementos complejos no soportados.</td><td>Comparar con el original y comprobar las limitaciones del conversor.</td></tr>
+            <tr><td><strong>14</strong></td><td><strong>TABLAS MAL REPRESENTADAS</strong><br>Columnas desordenadas.</td><td>Maquetación compleja en origen.</td><td>Comprobar el original y utilizar una herramienta especializada cuando sea necesario.</td></tr>
+            <tr><td><strong>15</strong></td><td><strong>PROBLEMAS DE CODIFICACIÓN</strong><br>Caracteres extraños.</td><td>Codificación distinta de UTF-8.</td><td>Utilizar UTF-8 en archivos de texto y revisar la codificación original.</td></tr>
+            <tr><td><strong>16</strong></td><td><strong>CONFLICTOS DE VERSIONES</strong><br>Dependencias incompatibles.</td><td>Paquetes mezclados en el entorno.</td><td>Crear un entorno virtual limpio y reinstalar.</td></tr>
+            <tr><td><strong>17</strong></td><td><strong>INSTALACIÓN INTERRUMPIDA</strong><br>Paquete incompleto.</td><td>Descarga o instalación cortada.</td><td><code>python -m pip install --upgrade --force-reinstall markitdown</code> (y reinstalar extras si faltan).</td></tr>
+            <tr><td><strong>18</strong></td><td><strong>ERROR DE CONEXIÓN</strong><br>No puede descargar dependencias.</td><td>Fallo de red o bloqueo corporativo.</td><td>Comprobar Internet, proxy y acceso a PyPI.</td></tr>
+            <tr><td><strong>19</strong></td><td><strong>CREDENCIALES AUSENTES</strong><br>Un servicio externo rechaza la solicitud.</td><td>Falta clave API para funciones externas.</td><td>Configurar las credenciales exigidas por el servicio correspondiente.</td></tr>
+            <tr><td><strong>20</strong></td><td><strong>PLUGIN NO ENCONTRADO</strong><br>No aparece en la lista.</td><td>Plugin no instalado o incompatible.</td><td>Comprobar su instalación, compatibilidad y configuración.</td></tr>
+            <tr><td><strong>21</strong></td><td><strong>ARCHIVO DE SALIDA VACÍO</strong><br>El Markdown no contiene información.</td><td>Origen sin texto extraíble o falta dependencia.</td><td>Comprobar el original y si el formato necesita OCR u otra dependencia.</td></tr>
+            <tr><td><strong>22</strong></td><td><strong>RESULTADO DESORDENADO</strong><br>El texto aparece en orden incorrecto.</td><td>Múltiples columnas o cajas flotantes.</td><td>Revisar columnas, tablas y estructura visual del original.</td></tr>
+            <tr><td><strong>23</strong></td><td><strong>ERROR DE IMPORTACIÓN PYTHON</strong><br>No se puede importar MarkItDown.</td><td>Ejecutando Python global en lugar de <code>.venv</code>.<br>Comprobar: <code>python -m pip show markitdown</code></td><td>Asegurarse de que se ejecuta el Python del entorno virtual.</td></tr>
+            <tr><td><strong>24</strong></td><td><strong>NO SE ENCUENTRA EL ENTORNO VIRTUAL</strong><br>No existe <code>.venv</code>.</td><td>Entorno no creado o eliminado.</td><td><code>py -3.12 -m venv .venv</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="tab-footer-nav">
+      <button type="button" class="btn-secondary prev-tab-btn" data-prev="9">← Anterior: 33 Preguntas (Q&amp;A)</button>
+      <button type="button" class="btn-primary next-tab-btn" data-next="11">Siguiente: Glosario →</button>
+    </div>
+  </section>
+
+  <!-- PESTAÑA 11: GLOSARIO -->
+  <section class="tab-panel" data-t="Glosario" id="tab-11">
+    <div class="card">
+      <h2 class="section-heading">10. Glosario Completo (A — Z y Conceptos Clave)</h2>
+      <div class="table-responsive">
+        <table>
+          <thead>
+            <tr>
+              <th>Término</th>
+              <th>Definición y Ejemplo</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>API</strong></td><td><em>Application Programming Interface</em>. Interfaz de programación de aplicaciones. Permite que un programa utilice las funciones de otro. Ejemplo: utilizar MarkItDown desde Python.</td></tr>
+            <tr><td><strong>Biblioteca</strong></td><td>Conjunto de herramientas de software reutilizables. Ejemplo: MarkItDown proporciona una biblioteca para convertir documentos.</td></tr>
+            <tr><td><strong>CLI</strong></td><td><em>Command Line Interface</em>. Interfaz de línea de comandos. Ejemplo: ejecutar <code>markitdown</code> desde PowerShell.</td></tr>
+            <tr><td><strong>CSV</strong></td><td><em>Comma-Separated Values</em>. Valores separados por comas. Formato habitual de datos tabulares.</td></tr>
+            <tr><td><strong>Dependencia</strong></td><td>Componente que necesita un programa. Ejemplo: <code>pdfplumber</code> para determinadas operaciones PDF.</td></tr>
+            <tr><td><strong>DOCX</strong></td><td>Formato de documentos de Microsoft Word.</td></tr>
+            <tr><td><strong>EPUB</strong></td><td><em>Electronic Publication</em>. Formato de libros electrónicos.</td></tr>
+            <tr><td><strong>Entorno virtual</strong></td><td>Espacio aislado para instalar dependencias de un proyecto.</td></tr>
+            <tr><td><strong>EXIF</strong></td><td><em>Exchangeable Image File Format</em>. Información asociada a fotografías.</td></tr>
+            <tr><td><strong>Formato</strong></td><td>Estructura utilizada para almacenar información.</td></tr>
+            <tr><td><strong>HTML</strong></td><td><em>HyperText Markup Language</em>. Lenguaje utilizado para estructurar páginas web.</td></tr>
+            <tr><td><strong>IA</strong></td><td>Inteligencia Artificial.</td></tr>
+            <tr><td><strong>JSON</strong></td><td><em>JavaScript Object Notation</em>. Formato de intercambio de datos estructurados.</td></tr>
+            <tr><td><strong>LLM</strong></td><td><em>Large Language Model</em>. Modelo de lenguaje grande.</td></tr>
+            <tr><td><strong>Markdown</strong></td><td>Formato de texto estructurado mediante símbolos sencillos.</td></tr>
+            <tr><td><strong>MD</strong></td><td>Extensión habitual de los archivos Markdown.</td></tr>
+            <tr><td><strong>MCP</strong></td><td><em>Model Context Protocol</em>. Protocolo para conectar modelos de IA con herramientas y fuentes de información.</td></tr>
+            <tr><td><strong>Metadatos</strong></td><td>Datos que describen otros datos.</td></tr>
+            <tr><td><strong>OCR</strong></td><td><em>Optical Character Recognition</em>. Reconocimiento óptico de caracteres.</td></tr>
+            <tr><td><strong>Paquete</strong></td><td>Unidad de software instalable.</td></tr>
+            <tr><td><strong>PDF</strong></td><td><em>Portable Document Format</em>. Formato de documento portátil.</td></tr>
+            <tr><td><strong>PATH</strong></td><td>Variable que contiene ubicaciones donde Windows busca programas.</td></tr>
+            <tr><td><strong>Pipeline</strong></td><td>Secuencia organizada de operaciones.</td></tr>
+            <tr><td><strong>Plugin</strong></td><td>Complemento que amplía las capacidades de un programa.</td></tr>
+            <tr><td><strong>PowerShell</strong></td><td>Entorno de comandos y automatización de Windows.</td></tr>
+            <tr><td><strong>Prompt</strong></td><td>Instrucción que proporcionamos a una inteligencia artificial.</td></tr>
+            <tr><td><strong>Python</strong></td><td>Lenguaje de programación utilizado para ejecutar MarkItDown.</td></tr>
+            <tr><td><strong>RAG</strong></td><td><em>Retrieval-Augmented Generation</em>. Generación aumentada mediante recuperación de información.</td></tr>
+            <tr><td><strong>Repositorio</strong></td><td>Lugar donde se almacena y mantiene el código de un proyecto.</td></tr>
+            <tr><td><strong>SDK</strong></td><td><em>Software Development Kit</em>. Kit de desarrollo de software.</td></tr>
+            <tr><td><strong>Shell</strong></td><td>Programa que interpreta comandos.</td></tr>
+            <tr><td><strong>Terminal</strong></td><td>Interfaz para escribir instrucciones al ordenador.</td></tr>
+            <tr><td><strong>Token</strong></td><td>Unidad de texto procesada por un modelo de lenguaje.</td></tr>
+            <tr><td><strong>Transcripción</strong></td><td>Conversión del contenido hablado a texto.</td></tr>
+            <tr><td><strong>URL</strong></td><td><em>Uniform Resource Locator</em>. Dirección de un recurso en Internet.</td></tr>
+            <tr><td><strong>UTF-8</strong></td><td>Sistema de codificación de caracteres.</td></tr>
+            <tr><td><strong>Variable de entorno</strong></td><td>Valor utilizado por programas para obtener configuraciones del sistema.</td></tr>
+            <tr><td><strong>XLS</strong></td><td>Formato antiguo de Microsoft Excel.</td></tr>
+            <tr><td><strong>XLSX</strong></td><td>Formato moderno de Microsoft Excel.</td></tr>
+            <tr><td><strong>XML</strong></td><td><em>Extensible Markup Language</em>. Lenguaje de marcado extensible.</td></tr>
+            <tr><td><strong>ZIP</strong></td><td>Formato de archivo comprimido.</td></tr>
+            <tr><td><strong>ENTRADA ESTÁNDAR</strong></td><td>Canal por el que un programa recibe información.</td></tr>
+            <tr><td><strong>SALIDA ESTÁNDAR</strong></td><td>Canal por el que un programa muestra resultados.</td></tr>
+            <tr><td><strong>TUBERÍA</strong></td><td>Mecanismo que conecta la salida de un programa con la entrada de otro.</td></tr>
+            <tr><td><strong>SERVICIO EN LA NUBE</strong></td><td>Servicio informático ejecutado en infraestructura remota.</td></tr>
+            <tr><td><strong>CLAVE API</strong></td><td>Credencial utilizada para acceder a determinados servicios.</td></tr>
+            <tr><td><strong>CONVERSIÓN</strong></td><td>Transformación de un formato a otro.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="tab-footer-nav">
+      <button type="button" class="btn-secondary prev-tab-btn" data-prev="10">← Anterior: ERRORES</button>
+      <button type="button" class="btn-primary next-tab-btn" data-next="12">Siguiente: FUENTES →</button>
+    </div>
+  </section>
+
+  <!-- PESTAÑA 12: FUENTES -->
+  <section class="tab-panel" data-t="FUENTES" id="tab-12">
+    <div class="card">
+      <h2 class="section-heading">11. Fuentes y Documentación Oficial</h2>
+
+      <div class="url-card">
+        <strong>1. REPOSITORIO OFICIAL (Microsoft)</strong>
+        <p style="margin:0;font-size:0.9rem;color:var(--text-secondary);">Código fuente, instalación, formatos, ejemplos, API y plugins.</p>
+        <span class="url-text">https://github.com/microsoft/markitdown</span>
+        <div class="url-actions">
+          <a href="https://github.com/microsoft/markitdown" target="_blank" rel="noopener noreferrer" class="btn-external">Abrir enlace en nueva ventana ↗</a>
+          <button type="button" class="copy-btn" data-copy="https://github.com/microsoft/markitdown">Copiar URL</button>
+        </div>
+      </div>
+
+      <div class="url-card">
+        <strong>2. README OFICIAL</strong>
+        <p style="margin:0;font-size:0.9rem;color:var(--text-secondary);">Uso, instalación, formatos y características.</p>
+        <span class="url-text">https://github.com/microsoft/markitdown/blob/main/README.md</span>
+        <div class="url-actions">
+          <a href="https://github.com/microsoft/markitdown/blob/main/README.md" target="_blank" rel="noopener noreferrer" class="btn-external">Abrir enlace en nueva ventana ↗</a>
+          <button type="button" class="copy-btn" data-copy="https://github.com/microsoft/markitdown/blob/main/README.md">Copiar URL</button>
+        </div>
+      </div>
+
+      <div class="url-card">
+        <strong>3. PYPI (Índice de Paquetes Python)</strong>
+        <p style="margin:0;font-size:0.9rem;color:var(--text-secondary);">Versión 0.1.9 consultada. Dependencias, requisitos de Python y extras de instalación.</p>
+        <span class="url-text">https://pypi.org/project/markitdown/</span>
+        <div class="url-actions">
+          <a href="https://pypi.org/project/markitdown/" target="_blank" rel="noopener noreferrer" class="btn-external">Abrir enlace en nueva ventana ↗</a>
+          <button type="button" class="copy-btn" data-copy="https://pypi.org/project/markitdown/">Copiar URL</button>
+        </div>
+      </div>
+
+      <div class="url-card">
+        <strong>4. CONFIGURACIÓN DEL PAQUETE (pyproject.toml)</strong>
+        <p style="margin:0;font-size:0.9rem;color:var(--text-secondary);">Dependencias y extras declarados por el proyecto.</p>
+        <span class="url-text">https://github.com/microsoft/markitdown/blob/main/packages/markitdown/pyproject.toml</span>
+        <div class="url-actions">
+          <a href="https://github.com/microsoft/markitdown/blob/main/packages/markitdown/pyproject.toml" target="_blank" rel="noopener noreferrer" class="btn-external">Abrir enlace en nueva ventana ↗</a>
+          <button type="button" class="copy-btn" data-copy="https://github.com/microsoft/markitdown/blob/main/packages/markitdown/pyproject.toml">Copiar URL</button>
+        </div>
+      </div>
+
+      <div class="url-card">
+        <strong>5. DOCUMENTACIÓN PYTHON</strong>
+        <p style="margin:0;font-size:0.9rem;color:var(--text-secondary);">Lenguaje y entorno de ejecución.</p>
+        <span class="url-text">https://docs.python.org/3/</span>
+        <div class="url-actions">
+          <a href="https://docs.python.org/3/" target="_blank" rel="noopener noreferrer" class="btn-external">Abrir enlace en nueva ventana ↗</a>
+          <button type="button" class="copy-btn" data-copy="https://docs.python.org/3/">Copiar URL</button>
+        </div>
+      </div>
+
+      <div class="url-card">
+        <strong>6. DOCUMENTACIÓN PIP</strong>
+        <p style="margin:0;font-size:0.9rem;color:var(--text-secondary);">Instalación y administración de paquetes.</p>
+        <span class="url-text">https://pip.pypa.io/en/stable/</span>
+        <div class="url-actions">
+          <a href="https://pip.pypa.io/en/stable/" target="_blank" rel="noopener noreferrer" class="btn-external">Abrir enlace en nueva ventana ↗</a>
+          <button type="button" class="copy-btn" data-copy="https://pip.pypa.io/en/stable/">Copiar URL</button>
+        </div>
+      </div>
+
+      <div class="url-card">
+        <strong>7. DOCUMENTACIÓN WINDOWS</strong>
+        <p style="margin:0;font-size:0.9rem;color:var(--text-secondary);">Sistema operativo y configuración.</p>
+        <span class="url-text">https://learn.microsoft.com/windows/</span>
+        <div class="url-actions">
+          <a href="https://learn.microsoft.com/windows/" target="_blank" rel="noopener noreferrer" class="btn-external">Abrir enlace en nueva ventana ↗</a>
+          <button type="button" class="copy-btn" data-copy="https://learn.microsoft.com/windows/">Copiar URL</button>
+        </div>
+      </div>
+
+      <div class="url-card">
+        <strong>8. PYTHON PARA WINDOWS</strong>
+        <p style="margin:0;font-size:0.9rem;color:var(--text-secondary);">Instaladores oficiales.</p>
+        <span class="url-text">https://www.python.org/downloads/windows/</span>
+        <div class="url-actions">
+          <a href="https://www.python.org/downloads/windows/" target="_blank" rel="noopener noreferrer" class="btn-external">Abrir enlace en nueva ventana ↗</a>
+          <button type="button" class="copy-btn" data-copy="https://www.python.org/downloads/windows/">Copiar URL</button>
+        </div>
+      </div>
+
+      <div class="alert-box">
+        <strong>NOTA:</strong> MarkItDown evoluciona. Antes de repetir una instalación meses después, consulta el repositorio y PyPI para verificar versiones, dependencias y cambios.
+      </div>
+    </div>
+
+    <div class="tab-footer-nav">
+      <button type="button" class="btn-secondary prev-tab-btn" data-prev="11">← Anterior: Glosario</button>
+      <button type="button" class="btn-primary next-tab-btn" data-next="13">Siguiente: Plan y Créditos →</button>
+    </div>
+  </section>
+
+  <!-- PESTAÑA 13: PLAN Y CRÉDITOS -->
+  <section class="tab-panel" data-t="Plan y Créditos" id="tab-13">
+    <div class="card">
+      <h2 class="section-heading">13. Créditos</h2>
+      
+      <!-- Instancia SVG Compartida con INICIO -->
+      <div class="svg-stage" id="svg-host-credits"></div>
+      <div class="svg-controls" style="max-width:440px;margin:-10px auto 16px auto;border-radius:0 0 12px 12px;">
+        <span>Ilustración: Pipeline MarkItDown → LLM</span>
+        <button type="button" class="util-btn" id="toggle-anim-credits" style="min-height:30px;font-size:0.78rem;">⏸ Pausar</button>
+      </div>
+
+      <p style="text-align:center;color:var(--text-secondary);">Representación vectorial animada de la conversión multiformato hacia Markdown estructurado para sistemas de Inteligencia Artificial.</p>
+
+      <div class="author-hero-box">
+        <div class="author-name-big">Rubén Sbarsky</div>
+        <p style="font-size:1.1rem;font-weight:700;margin-bottom:8px;">Autor del tutorial.</p>
+        <p style="font-size:0.92rem;color:var(--text-secondary);margin-bottom:4px;"><strong>Sincronización del tutorial:</strong> Fecha: 23/11/2026 — Hora: 11:45:05</p>
+        <p style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:4px;"><strong>Referencia fuente original:</strong> Fecha 📆: 22/11/2026 — Hora 🕰: 18:35:32</p>
+        <span class="badge">Versión: tutorial_markitdown_V001.html</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 class="section-heading">12. Plan de Aprendizaje y Dominio</h2>
+      <div class="table-responsive">
+        <table>
+          <thead>
+            <tr>
+              <th>Etapa</th>
+              <th>Objetivos</th>
+              <th>Resultado Esperado</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>ETAPA 1 — FUNDAMENTOS</strong></td><td>Comprender MarkItDown, Markdown, Python y PowerShell.</td><td>Poder explicar qué hace MarkItDown.</td></tr>
+            <tr><td><strong>ETAPA 2 — INSTALACIÓN</strong></td><td>Instalar Python, crear entorno virtual e instalar MarkItDown.</td><td>Tener una instalación funcional.</td></tr>
+            <tr><td><strong>ETAPA 3 — CONVERSIONES</strong></td><td>Convertir TXT, PDF, DOCX, XLSX y PPTX.</td><td>Obtener archivos Markdown y comprobarlos.</td></tr>
+            <tr><td><strong>ETAPA 4 — FORMATOS COMPLEMENTARIOS</strong></td><td>Trabajar con CSV, JSON, HTML; comprender OCR, audio y YouTube.</td><td>Reconocer posibilidades y limitaciones.</td></tr>
+            <tr><td><strong>ETAPA 5 — AUTOMATIZACIÓN</strong></td><td>Procesar varios archivos, crear scripts, usar Python y organizar resultados.</td><td>Crear una biblioteca documental.</td></tr>
+            <tr><td><strong>ETAPA 6 — INTELIGENCIA ARTIFICIAL</strong></td><td>Preparar documentos para LLM, comprender RAG, comprobar respuestas e identificar errores.</td><td>Utilizar documentos convertidos como material de análisis.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Lista Final de Comprobación Interactiva (<span id="checklist-counter">0/25</span>)</h3>
+      <div id="checklist-container"></div>
+    </div>
+
+    <div class="tab-footer-nav">
+      <button type="button" class="btn-secondary prev-tab-btn" data-prev="12">← Anterior: FUENTES</button>
+      <span></span>
+    </div>
+  </section>
+
+</main>
+
+<!-- Botones Flotantes Arrastrables -->
+<button type="button" class="floating-draggable" id="btn-float-home" aria-label="Ir a Inicio (Arrastrable)" title="Ir a Inicio (Puedes arrastrarme)">
+  <span>🏠</span>
+  <span>INICIO</span>
+</button>
+
+<button type="button" class="floating-draggable" id="btn-float-top" aria-label="Volver arriba (Arrastrable)" title="Subir al comienzo de la pestaña (Puedes arrastrarme)">
+  <span>▲</span>
+  <span>ARRIBA</span>
+</button>
+
+<!-- Toast Notificaciones -->
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(() => {
+  "use strict";
+
+  const STORAGE_KEYS = {
+    TAB: "mkd_tut_active_tab",
+    THEME: "mkd_tut_theme",
+    FONT: "mkd_tut_font_px",
+    CHECKS: "mkd_tut_checklist_v1"
+  };
+
+  const CHECKLIST_ITEMS = [
+    "Sé instalar Python.",
+    "Sé utilizar PowerShell.",
+    "Sé crear un entorno virtual.",
+    "Sé instalar MarkItDown.",
+    "Sé comprobar la instalación.",
+    "Sé convertir archivos TXT.",
+    "Sé convertir PDF.",
+    "Sé convertir DOCX.",
+    "Sé convertir PPTX.",
+    "Sé convertir XLSX.",
+    "Sé convertir CSV.",
+    "Sé convertir JSON.",
+    "Sé convertir HTML.",
+    "Comprendo OCR.",
+    "Comprendo las dependencias opcionales.",
+    "Sé utilizar plugins.",
+    "Sé procesar varios documentos.",
+    "Sé utilizar la API Python.",
+    "Sé diagnosticar errores.",
+    "Sé comprobar la calidad de las conversiones.",
+    "Sé organizar una biblioteca documental.",
+    "Comprendo qué es RAG.",
+    "Sé preparar documentos para una LLM.",
+    "Comprendo los riesgos de privacidad.",
+    "Sé consultar la documentación oficial."
+  ];
+
+  const state = {
+    activeTab: 0,
+    fontSize: 16,
+    isPaused: false,
+    svgTemplateHTML: ""
+  };
+
+  function safeStorageGet(key, fallback) {
+    try {
+      const val = localStorage.getItem(key);
+      return val !== null ? val : fallback;
+    } catch {
+      return fallback;
+    }
+  }
+
+  function safeStorageSet(key, value) {
+    try {
+      localStorage.setItem(key, value);
+    } catch {
+      // Ignorar silenciosamente si localStorage está restringido
+    }
+  }
+
+  function showToast(message) {
+    const toast = document.getElementById("toast");
+    toast.textContent = message;
+    toast.classList.add("show");
+    clearTimeout(toast._timer);
+    toast._timer = setTimeout(() => toast.classList.remove("show"), 2600);
+  }
+
+  /* =========================================================
+     1. GESTIÓN DE SVG ÚNICO CON IDS ÚNICOS Y FALLBACK
+     ========================================================= */
+  function extractAndCleanSvgTemplate() {
+    const tpl = document.getElementById("hero-svg-template");
+    if (!tpl) return;
+    state.svgTemplateHTML = tpl.innerHTML.trim();
+    tpl.remove();
+  }
+
+  function createUniqueSvgMarkup(suffix) {
+    const ids = ["bgGrad", "coreBeam", "mdShield", "neonGlow"];
+    let html = state.svgTemplateHTML;
+    ids.forEach(id => {
+      const uniqueId = `${id}_${suffix}`;
+      html = html.replace(new RegExp(`id="${id}"`, "g"), `id="${uniqueId}"`);
+      html = html.replace(new RegExp(`url\\(#${id}\\)`, "g"), `url(#${uniqueId})`);
+    });
+    return html;
+  }
+
+  function mountSvgInstance(containerId, suffix) {
+    const host = document.getElementById(containerId);
+    if (!host || !state.svgTemplateHTML) return;
+    try {
+      host.innerHTML = createUniqueSvgMarkup(suffix);
+      const svgEl = host.querySelector("svg");
+      if (svgEl) {
+        if (state.isPaused && typeof svgEl.pauseAnimations === "function") {
+          svgEl.pauseAnimations();
+        } else if (!state.isPaused && typeof svgEl.unpauseAnimations === "function") {
+          svgEl.unpauseAnimations();
+        }
+      }
+    } catch {
+      const encoded = encodeURIComponent(state.svgTemplateHTML);
+      host.innerHTML = `<img src="data:image/svg+xml;utf8,${encoded}" alt="Ilustración MarkItDown" style="width:100%;display:block;">`;
+    }
+  }
+
+  function ensureVisibleSvgsMounted() {
+    if (state.activeTab === 0) {
+      const homeHost = document.getElementById("svg-host-home");
+      if (homeHost && !homeHost.querySelector("svg, img")) {
+        mountSvgInstance("svg-host-home", "home");
+      }
+    }
+    if (state.activeTab === 13) {
+      const credHost = document.getElementById("svg-host-credits");
+      if (credHost && !credHost.querySelector("svg, img")) {
+        mountSvgInstance("svg-host-credits", "credits");
+      }
+    }
+  }
+
+  function toggleSvgAnimations() {
+    state.isPaused = !state.isPaused;
+    document.querySelectorAll(".svg-stage svg").forEach(svg => {
+      if (typeof svg.pauseAnimations === "function") {
+        state.isPaused ? svg.pauseAnimations() : svg.unpauseAnimations();
+      }
+    });
+    const label = state.isPaused ? "▶ Reanudar" : "⏸ Pausar";
+    const btnHome = document.getElementById("toggle-anim-home");
+    const btnCred = document.getElementById("toggle-anim-credits");
+    if (btnHome) btnHome.textContent = label;
+    if (btnCred) btnCred.textContent = label;
+  }
+
+  /* =========================================================
+     2. NAVEGACIÓN DE PESTAÑAS E ÍNDICE LATERAL (#dr)
+     ========================================================= */
+  const panels = Array.from(document.querySelectorAll(".tab-panel"));
+  const tabButtons = Array.from(document.querySelectorAll("#tabs-bar .chip"));
+  const drawer = document.getElementById("dr");
+  const menuBtn = document.getElementById("mb");
+
+  function toggleDrawer(forceState) {
+    const isOpen = drawer.classList.toggle("o", forceState);
+    menuBtn.setAttribute("aria-expanded", String(isOpen));
+  }
+
+  function buildDrawerIndex() {
+    drawer.innerHTML = "";
+    panels.forEach((panel, index) => {
+      const link = document.createElement("a");
+      const title = panel.dataset.t || (panel.querySelector("h2") ? panel.querySelector("h2").textContent : `Sección ${index}`);
+      link.textContent = (index ? `${index}. ` : "") + title;
+      link.setAttribute("role", "button");
+      link.tabIndex = 0;
+      link.onclick = () => {
+        goToTab(index);
+        toggleDrawer(false);
+      };
+      link.onkeydown = (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          goToTab(index);
+          toggleDrawer(false);
+        }
+      };
+      drawer.appendChild(link);
+    });
+  }
+
+  function goToTab(index) {
+    if (index < 0 || index >= panels.length) return;
+    state.activeTab = index;
+
+    panels.forEach((p, i) => p.classList.toggle("active", i === index));
+    tabButtons.forEach((btn, i) => {
+      const isSelected = i === index;
+      btn.classList.toggle("active", isSelected);
+      btn.setAttribute("aria-selected", String(isSelected));
+      if (isSelected) {
+        btn.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+      }
+    });
+
+    Array.from(drawer.children).forEach((link, i) => {
+      link.classList.toggle("on", i === index);
+    });
+
+    if (index === 0) mountSvgInstance("svg-host-home", "home");
+    if (index === 13) mountSvgInstance("svg-host-credits", "credits");
+
+    safeStorageSet(STORAGE_KEYS.TAB, String(index));
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    updateReadingProgress();
+  }
+
+  /* =========================================================
+     3. COPIA AL PORTAPAPELES CON FALLBACK SEGURO
+     ========================================================= */
+  async function copyToClipboard(text, triggerBtn) {
+    try {
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(text);
+      } else {
+        const ta = document.createElement("textarea");
+        ta.value = text;
+        ta.style.position = "fixed";
+        ta.style.left = "-9999px";
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand("copy");
+        ta.remove();
+      }
+      const prevText = triggerBtn.textContent;
+      triggerBtn.textContent = "✓ Copiado";
+      showToast("Contenido copiado exactamente al portapapeles.");
+      setTimeout(() => { triggerBtn.textContent = prevText; }, 1800);
+    } catch {
+      showToast("No se pudo copiar automáticamente. Selecciona el texto manualmente.");
+    }
+  }
+
+  /* =========================================================
+     4. BUSCADOR INTERNO EN TIEMPO REAL
+     ========================================================= */
+  function clearHighlights() {
+    document.querySelectorAll("mark.search-hl").forEach(mark => {
+      const parent = mark.parentNode;
+      parent.replaceChild(document.createTextNode(mark.textContent), mark);
+      parent.normalize();
+    });
+  }
+
+  function highlightMatches(query) {
+    clearHighlights();
+    const clean = query.trim();
+    if (clean.length < 2) return;
+
+    const escaped = clean.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const regex = new RegExp(`(${escaped})`, "gi");
+    const walker = document.createTreeWalker(document.getElementById("main-content"), NodeFilter.SHOW_TEXT, null);
+    const nodes = [];
+    let current;
+    while ((current = walker.nextNode())) {
+      if (current.parentElement && !["SCRIPT", "STYLE", "PRE", "CODE"].includes(current.parentElement.tagName)) {
+        if (regex.test(current.nodeValue)) nodes.push(current);
+      }
+    }
+
+    let firstFoundPanel = -1;
+    nodes.forEach(textNode => {
+      const panel = textNode.parentElement.closest(".tab-panel");
+      if (panel && firstFoundPanel === -1) {
+        firstFoundPanel = panels.indexOf(panel);
+      }
+      const span = document.createElement("span");
+      span.innerHTML = textNode.nodeValue.replace(regex, '<mark class="search-hl">$1</mark>');
+      textNode.parentNode.replaceChild(span, textNode);
+    });
+
+    if (firstFoundPanel !== -1 && firstFoundPanel !== state.activeTab) {
+      goToTab(firstFoundPanel);
+    }
+  }
+
+  /* =========================================================
+     5. BOTONES FLOTANTES ARRASTRABLES (INICIO Y ARRIBA)
+     ========================================================= */
+  function makeDraggable(element, onClickAction) {
+    let startX = 0, startY = 0, origLeft = 0, origTop = 0, moved = false;
+
+    const onPointerDown = (e) => {
+      moved = false;
+      const rect = element.getBoundingClientRect();
+      startX = e.clientX;
+      startY = e.clientY;
+      origLeft = rect.left;
+      origTop = rect.top;
+      element.setPointerCapture(e.pointerId);
+    };
+
+    const onPointerMove = (e) => {
+      if (!element.hasPointerCapture(e.pointerId)) return;
+      const dx = e.clientX - startX;
+      const dy = e.clientY - startY;
+      if (Math.abs(dx) > 5 || Math.abs(dy) > 5) moved = true;
+      if (!moved) return;
+
+      const maxLeft = window.innerWidth - element.offsetWidth - 8;
+      const maxTop = window.innerHeight - element.offsetHeight - 8;
+      const newLeft = Math.min(Math.max(8, origLeft + dx), maxLeft);
+      const newTop = Math.min(Math.max(66, origTop + dy), maxTop);
+
+      element.style.left = `${newLeft}px`;
+      element.style.top = `${newTop}px`;
+      element.style.right = "auto";
+      element.style.bottom = "auto";
+    };
+
+    const onPointerUp = (e) => {
+      if (element.hasPointerCapture(e.pointerId)) {
+        element.releasePointerCapture(e.pointerId);
+      }
+      if (!moved) {
+        onClickAction();
+      }
+    };
+
+    element.addEventListener("pointerdown", onPointerDown);
+    element.addEventListener("pointermove", onPointerMove);
+    element.addEventListener("pointerup", onPointerUp);
+  }
+
+  /* =========================================================
+     6. CHECKLIST PERSISTENTE Y PROGRESO DE LECTURA
+     ========================================================= */
+  function buildChecklist() {
+    const container = document.getElementById("checklist-container");
+    const counter = document.getElementById("checklist-counter");
+    if (!container) return;
+
+    let saved = {};
+    try {
+      saved = JSON.parse(safeStorageGet(STORAGE_KEYS.CHECKS, "{}"));
+    } catch {
+      saved = {};
+    }
+
+    const updateCount = () => {
+      const total = CHECKLIST_ITEMS.length;
+      const checked = Object.values(saved).filter(Boolean).length;
+      if (counter) counter.textContent = `${checked}/${total}`;
+    };
+
+    container.innerHTML = "";
+    CHECKLIST_ITEMS.forEach((label, idx) => {
+      const row = document.createElement("label");
+      row.className = "checklist-item";
+      const cb = document.createElement("input");
+      cb.type = "checkbox";
+      cb.checked = Boolean(saved[idx]);
+      cb.onchange = () => {
+        saved[idx] = cb.checked;
+        safeStorageSet(STORAGE_KEYS.CHECKS, JSON.stringify(saved));
+        updateCount();
+      };
+      const span = document.createElement("span");
+      span.textContent = label;
+      row.appendChild(cb);
+      row.appendChild(span);
+      container.appendChild(row);
+    });
+    updateCount();
+  }
+
+  function updateReadingProgress() {
+    const bar = document.getElementById("read-progress");
+    const scrollTop = window.scrollY;
+    const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+    const pct = docHeight > 0 ? Math.min(100, Math.round((scrollTop / docHeight) * 100)) : 100;
+    if (bar) bar.style.width = `${pct}%`;
+  }
+
+  /* =========================================================
+     7. IMPRESIÓN Y PDF
+     ========================================================= */
+  function handlePrint() {
+    const closedDetails = Array.from(document.querySelectorAll("details.accordion:not([open])"));
+    closedDetails.forEach(d => d.setAttribute("open", ""));
+    mountSvgInstance("svg-host-home", "home");
+    mountSvgInstance("svg-host-credits", "credits");
+
+    const restoreAfterPrint = () => {
+      closedDetails.forEach(d => d.removeAttribute("open"));
+      window.removeEventListener("afterprint", restoreAfterPrint);
+    };
+    window.addEventListener("afterprint", restoreAfterPrint);
+
+    try {
+      window.print();
+    } catch {
+      restoreAfterPrint();
+      showToast("Abre este archivo directamente en el navegador y utiliza Ctrl+P o Cmd+P");
+    }
+  }
+
+  /* =========================================================
+     8. INICIALIZACIÓN GLOBAL
+     ========================================================= */
+  function init() {
+    extractAndCleanSvgTemplate();
+    buildDrawerIndex();
+    buildChecklist();
+
+    // Restaurar preferencias
+    const savedTheme = safeStorageGet(STORAGE_KEYS.THEME, "dark");
+    document.documentElement.setAttribute("data-theme", savedTheme);
+
+    const savedFont = parseInt(safeStorageGet(STORAGE_KEYS.FONT, "16"), 10);
+    if (!Number.isNaN(savedFont) && savedFont >= 13 && savedFont <= 22) {
+      state.fontSize = savedFont;
+      document.documentElement.style.setProperty("--base-font", `${state.fontSize}px`);
+    }
+
+    const savedTab = parseInt(safeStorageGet(STORAGE_KEYS.TAB, "0"), 10);
+    goToTab(!Number.isNaN(savedTab) && savedTab >= 0 && savedTab < panels.length ? savedTab : 0);
+
+    // Eventos de pestañas y cajón índice
+    tabButtons.forEach((btn, idx) => btn.addEventListener("click", () => goToTab(idx)));
+    menuBtn.addEventListener("click", () => toggleDrawer());
+    document.getElementById("ix").addEventListener("click", () => toggleDrawer(true));
+    document.getElementById("nav-logo-home").addEventListener("click", () => goToTab(0));
+    document.getElementById("start-course-btn").addEventListener("click", () => goToTab(1));
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") toggleDrawer(false);
+    });
+    document.addEventListener("click", (e) => {
+      if (!e.target.closest("#dr, #mb, #ix")) toggleDrawer(false);
+    });
+
+    // Botones Anterior y Siguiente al pie de cada pestaña
+    document.querySelectorAll(".next-tab-btn").forEach(btn => {
+      btn.addEventListener("click", () => goToTab(Number(btn.dataset.next)));
+    });
+    document.querySelectorAll(".prev-tab-btn").forEach(btn => {
+      btn.addEventListener("click", () => goToTab(Number(btn.dataset.prev)));
+    });
+
+    // Botones de control de las 33 Preguntas (Default: todas plegadas)
+    const qaItems = Array.from(document.querySelectorAll("#qa-container details.qa-item"));
+    qaItems.forEach(item => item.removeAttribute("open"));
+    document.getElementById("expand-all-qa").addEventListener("click", () => {
+      qaItems.forEach(item => item.setAttribute("open", ""));
+    });
+    document.getElementById("collapse-all-qa").addEventListener("click", () => {
+      qaItems.forEach(item => item.removeAttribute("open"));
+    });
+
+    // Botones Copiar
+    document.querySelectorAll(".copy-btn").forEach(btn => {
+      btn.addEventListener("click", () => copyToClipboard(btn.dataset.copy || "", btn));
+    });
+
+    // Buscador
+    const searchInput = document.getElementById("search-input");
+    const searchClear = document.getElementById("search-clear");
+    searchInput.addEventListener("input", () => {
+      const val = searchInput.value;
+      searchClear.style.display = val ? "block" : "none";
+      highlightMatches(val);
+    });
+    searchClear.addEventListener("click", () => {
+      searchInput.value = "";
+      searchClear.style.display = "none";
+      clearHighlights();
+    });
+
+    // Utilidades: fuente, tema, impresión, pausa SVG
+    document.getElementById("font-dec").addEventListener("click", () => {
+      state.fontSize = Math.max(13, state.fontSize - 1);
+      document.documentElement.style.setProperty("--base-font", `${state.fontSize}px`);
+      safeStorageSet(STORAGE_KEYS.FONT, String(state.fontSize));
+    });
+    document.getElementById("font-inc").addEventListener("click", () => {
+      state.fontSize = Math.min(22, state.fontSize + 1);
+      document.documentElement.style.setProperty("--base-font", `${state.fontSize}px`);
+      safeStorageSet(STORAGE_KEYS.FONT, String(state.fontSize));
+    });
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+      const current = document.documentElement.getAttribute("data-theme");
+      const next = current === "dark" ? "light" : "dark";
+      document.documentElement.setAttribute("data-theme", next);
+      safeStorageSet(STORAGE_KEYS.THEME, next);
+    });
+    document.getElementById("print-btn").addEventListener("click", handlePrint);
+    document.getElementById("toggle-anim-home").addEventListener("click", toggleSvgAnimations);
+    document.getElementById("toggle-anim-credits").addEventListener("click", toggleSvgAnimations);
+
+    // Botones flotantes arrastrables
+    makeDraggable(document.getElementById("btn-float-home"), () => goToTab(0));
+    makeDraggable(document.getElementById("btn-float-top"), () => {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+
+    window.addEventListener("scroll", updateReadingProgress, { passive: true });
+    setInterval(ensureVisibleSvgsMounted, 2000);
+  }
+
+  document.addEventListener("DOMContentLoaded", init);
+})();
+</script>
+</body>
+</html>
